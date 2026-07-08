@@ -61,9 +61,6 @@ components.html(
 )
 # --- 숨기기 설정 끝 ---
 
-# 1. 모바일 화면 설정 및 왕관 아이콘 -> 사이렌(🚨) 아이콘으로 변경
-
-
 # 🔴 [주의] 본인의 구글 주소를 꼭 따옴표"" 안에 다시 넣어주세요!
 WEBAPP_URL = st.secrets["WEBAPP_URL"]
 SHEET_ID = st.secrets["SHEET_ID"]
