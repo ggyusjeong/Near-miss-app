@@ -8,13 +8,6 @@ import streamlit.components.v1 as components
 # 1. 모바일 화면 설정
 st.set_page_config(page_title="아차사고 신고", layout="centered", initial_sidebar_state="collapsed")
 
-# 1. 모바일 화면 설정 및 왕관 아이콘 -> 사이렌(🚨) 아이콘으로 변경
-st.set_page_config(page_title="아차사고 신고", page_icon="🚨", layout="centered", initial_sidebar_state="collapsed")
-
-# 🔴 [주의] 본인의 구글 주소를 꼭 따옴표"" 안에 다시 넣어주세요!
-WEBAPP_URL = st.secrets["WEBAPP_URL"]
-SHEET_ID = st.secrets["SHEET_ID"]
-
 # --- UI 및 워터마크 완벽 숨기기 + 상단 맞춤 최적화 ---
 hide_streamlit_style = """
 <style>
@@ -67,6 +60,13 @@ components.html(
     width=0,
 )
 # --- 숨기기 설정 끝 ---
+
+# 1. 모바일 화면 설정 및 왕관 아이콘 -> 사이렌(🚨) 아이콘으로 변경
+st.set_page_config(page_title="아차사고 신고", page_icon="🚨", layout="centered", initial_sidebar_state="collapsed")
+
+# 🔴 [주의] 본인의 구글 주소를 꼭 따옴표"" 안에 다시 넣어주세요!
+WEBAPP_URL = st.secrets["WEBAPP_URL"]
+SHEET_ID = st.secrets["SHEET_ID"]
 
 # 1. 상단 인천여성가족재단 CI 로고
 col1, col2, col3 = st.columns([1.2, 1.6, 1.2])
