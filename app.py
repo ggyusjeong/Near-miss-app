@@ -37,6 +37,10 @@ footer:after {content: "" !important;}
     display: none !important;
     visibility: hidden !important;
 }
+/* 입력창 하단 "Press Ctrl+Enter..." 안내 문구 숨기기 */
+[data-testid="InputInstructions"] {
+    display: none !important;
+}
 </style>
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
