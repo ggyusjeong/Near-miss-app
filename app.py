@@ -7,44 +7,10 @@ import streamlit.components.v1 as components
 
 # 1. 모바일 화면 설정
 st.set_page_config(page_title="아차사고 신고", layout="centered", initial_sidebar_state="collapsed")
-import streamlit as st
-import pandas as pd
-import requests
-import json
-from datetime import datetime, timedelta, timezone
-import streamlit.components.v1 as components
 
 # 1. 모바일 화면 설정 및 왕관 아이콘 -> 사이렌(🚨) 아이콘으로 변경
 st.set_page_config(page_title="아차사고 신고", page_icon="🚨", layout="centered", initial_sidebar_state="collapsed")
 
-# 2. 자바스크립트를 이용해 탭 제목에서 ' · Streamlit' 강제 제거
-components.html(
-    """
-    <script>
-    const topDoc = window.parent.document;
-    
-    // 타이틀 강제 고정
-    topDoc.title = '아차사고 신고';
-    
-    // Streamlit이 타이틀을 다시 되돌리려는 것을 방지하는 감시기 설정
-    const observer = new MutationObserver(function(mutations) {
-        if (topDoc.title !== '아차사고 신고') {
-            topDoc.title = '아차사고 신고';
-        }
-    });
-    
-    const titleElement = topDoc.querySelector('title');
-    if (titleElement) {
-        observer.observe(titleElement, { childList: true, characterData: true, subtree: true });
-    }
-    </script>
-    """,
-    height=0,
-    width=0,
-)
-
-# 🔴 [주의] 본인의 구글 주소를 꼭 따옴표"" 안에 다시 넣어주세요! (비밀 금고 사용 시 st.secrets 유지)
-# ... (이하 기존 코드 동일) ...
 # 🔴 [주의] 본인의 구글 주소를 꼭 따옴표"" 안에 다시 넣어주세요!
 WEBAPP_URL = st.secrets["WEBAPP_URL"]
 SHEET_ID = st.secrets["SHEET_ID"]
