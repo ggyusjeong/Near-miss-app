@@ -103,7 +103,7 @@ with st.form("report_form"):
 
 # 4. 하단 아차사고 정의 안내 문구 박스 (회색 배경에 깔끔한 빨간 포인트 선)
 st.markdown(
-    "<div style='background-color: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 5px solid #ff4b4b; margin-top: -20px; margin-bottom: 20px;'>"
+    "<div style='background-color: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 5px solid #ff4b4b; margin-top: -10px; margin-bottom: 20px;'>"
     "<p style='margin: 0; font-weight: bold; color: #333333; font-size: 0.95rem;'>💡 아차사고(Near Miss)란?</p>"
     "<p style='margin: 6px 0 0 0; color: #555555; font-size: 0.85rem; line-height: 1.5; text-align: justify;'>"
     "부상이나 질병으로 이어질 뻔했던 아슬아슬한 위험 상황을 뜻합니다. "
