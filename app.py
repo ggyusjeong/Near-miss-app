@@ -65,9 +65,28 @@ components.html(
 )
 # --- 숨기기 설정 끝 ---
 
-# 🔴 [주의] 본인의 구글 주소를 꼭 따옴표"" 안에 다시 넣어주세요!
-WEBAPP_URL = st.secrets["WEBAPP_URL"]
-SHEET_ID = st.secrets["SHEET_ID"]
+import os
+import streamlit as st
+# ...(기타 import 내용)...
+
+# ==========================================
+# 🔴 기존에 있던 이 세 줄을 찾아서 지워주세요!
+# WEBAPP_URL = st.secrets["WEBAPP_URL"]
+# SHEET_ID = st.secrets["SHEET_ID"]
+# ADMIN_PW = st.secrets["ADMIN_PW"]
+# ==========================================
+
+# ✅ 아래 코드로 통째로 바꿔서 붙여넣어 주세요!
+if "WEBAPP_URL" in os.environ:
+    # 1. Render 서버 환경 (환경 변수에서 읽어오기)
+    WEBAPP_URL = os.environ["WEBAPP_URL"]
+    SHEET_ID = os.environ["SHEET_ID"]
+    ADMIN_PW = os.environ["ADMIN_PW"]
+else:
+    # 2. Streamlit Cloud 환경 (기존 secrets.toml에서 읽어오기)
+    WEBAPP_URL = st.secrets["WEBAPP_URL"]
+    SHEET_ID = st.secrets["SHEET_ID"]
+    ADMIN_PW = st.secrets["ADMIN_PW"]
 
 # 1. 상단 인천여성가족재단 CI 로고
 col1, col2, col3 = st.columns([1.2, 1.6, 1.2])
