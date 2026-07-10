@@ -136,18 +136,19 @@
 
     <form id="reportForm">
         <!-- 💡 파이썬 코드와 동일하게 장소 이름 맞춤 -->
-        <label>📍 발견 위치</label>
-        <div class="radio-group">
-            <div class="radio-item"><input type="radio" id="loc1" name="location" value="1층" required><label for="loc1">1층</label></div>
-            <div class="radio-item"><input type="radio" id="loc2" name="location" value="2층"><label for="loc2">2층</label></div>
-            <div class="radio-item"><input type="radio" id="loc3" name="location" value="3층"><label for="loc3">3층</label></div>
-            <div class="radio-item"><input type="radio" id="loc4" name="location" value="4층"><label for="loc4">4층</label></div>
-            <div class="radio-item"><input type="radio" id="loc5" name="location" value="별관"><label for="loc5">별관</label></div>
-            <div class="radio-item"><input type="radio" id="loc6" name="location" value="지상주차장"><label for="loc6">지상주차장</label></div>
-            <div class="radio-item"><input type="radio" id="loc7" name="location" value="지하주차장"><label for="loc7">지하주차장</label></div>
-            <div class="radio-item"><input type="radio" id="loc8" name="location" value="외곽"><label for="loc8">외곽</label></div>
-            <div class="radio-item"><input type="radio" id="loc9" name="location" value="기타"><label for="loc9">기타</label></div>
-        </div>
+<label for="location">📍 발견 위치</label>
+<select name="location" id="location" style="width: 100%; padding: 15px; margin-bottom: 25px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; background-color: #fff;" required>
+    <option value="" disabled selected>위치를 선택하세요</option>
+    <option value="1층">1층</option>
+    <option value="2층">2층</option>
+    <option value="3층">3층</option>
+    <option value="4층">4층</option>
+    <option value="별관">별관</option>
+    <option value="지상주차장">지상주차장</option>
+    <option value="지하주차장">지하주차장</option>
+    <option value="외곽">외곽</option>
+    <option value="기타">기타</option>
+</select>
 
         <!-- 💡 핵심: name 속성을 "content"에서 "description"으로 수정! -->
         <label>📝 어떤 위험 요소가 있나요?</label>
