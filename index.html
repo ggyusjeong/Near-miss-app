@@ -164,41 +164,44 @@
 </div>
 
 <script>
-    // 🔴 중요: 아래 "" 안에 선생님의 진짜 구글 스크립트 주소를 정확히 넣어주세요!
-    const WEBAPP_URL = "[https://script.google.com/macros/s/AKfycbwV4eDFz89GDCnKCaUCVo-tUP8LYNirnuWwotldQXd3p9TNn0bSw0QwaX8IF-QU6fe0/exec]";
+    // 🔴 중요: 여기에 선생님의 주소를 다시 넣어주세요!
+    const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwV4eDFz89GDCnKCaUCVo-tUP8LYNirnuWwotldQXd3p9TNn0bSw0QwaX8IF-QU6fe0/exec";
 
     const form = document.getElementById('reportForm');
     const submitBtn = document.getElementById('submitBtn');
 
     form.addEventListener('submit', function(e) {
-        e.preventDefault(); // 기본 새로고침 방지
+        e.preventDefault(); 
 
-        // 버튼 상태 변경
         submitBtn.innerText = "제출 중입니다...";
         submitBtn.disabled = true;
 
-        // 폼 데이터 수집
         const formData = new FormData(form);
-        
-        // 💡 핵심 추가: 구글 시트가 읽기 편하게 데이터를 변환해 줍니다 (URL 인코딩)
-        const data = new URLSearchParams(formData);
 
-        // 구글 시트로 데이터 전송
+        // 💡 핵심: 파이썬(Streamlit)에서 구글로 보내던 방식(JSON)과 똑같이 박스를 쌉니다.
+        const payload = {
+            "location": formData.get('location'),
+            "content": formData.get('content')
+        };
+
         fetch(WEBAPP_URL, {
             method: 'POST',
-            body: data,
-            mode: 'no-cors' // 브라우저 보안 장벽 무사 통과
+            mode: 'no-cors',
+            headers: {
+                // JSON 데이터를 단순 텍스트로 위장하여 보안 장벽을 통과하는 마법!
+                'Content-Type': 'text/plain;charset=utf-8' 
+            },
+            body: JSON.stringify(payload)
         })
         .then(() => {
             alert("✅ 아차사고 신고가 성공적으로 접수되었습니다. 안전에 기여해 주셔서 감사합니다!");
-            form.reset(); // 입력창 초기화
+            form.reset(); 
         })
         .catch(error => {
-            alert("❌ 통신 오류가 발생했습니다. 구글 주소가 정확한지 확인해 주세요.");
+            alert("❌ 통신 오류가 발생했습니다.");
             console.error('Error:', error);
         })
         .finally(() => {
-            // 버튼 상태 원상복구
             submitBtn.innerText = "신고 제출하기";
             submitBtn.disabled = false;
         });
