@@ -164,8 +164,8 @@
 </div>
 
 <script>
-    // 🔴 중요: 여기에 선생님의 구글 앱스 스크립트 주소를 큰따옴표 안에 넣어주세요!
-    const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwV4eDFz89GDCnKCaUCVo-tUP8LYNirnuWwotldQXd3p9TNn0bSw0QwaX8IF-QU6fe0/exec";
+    // 🔴 중요: 아래 "" 안에 선생님의 진짜 구글 스크립트 주소를 정확히 넣어주세요!
+    const WEBAPP_URL = "[https://script.google.com/macros/s/AKfycbwV4eDFz89GDCnKCaUCVo-tUP8LYNirnuWwotldQXd3p9TNn0bSw0QwaX8IF-QU6fe0/exec]";
 
     const form = document.getElementById('reportForm');
     const submitBtn = document.getElementById('submitBtn');
@@ -173,26 +173,28 @@
     form.addEventListener('submit', function(e) {
         e.preventDefault(); // 기본 새로고침 방지
 
-        // 버튼 상태 변경 (로딩 중)
+        // 버튼 상태 변경
         submitBtn.innerText = "제출 중입니다...";
         submitBtn.disabled = true;
 
         // 폼 데이터 수집
         const formData = new FormData(form);
+        
+        // 💡 핵심 추가: 구글 시트가 읽기 편하게 데이터를 변환해 줍니다 (URL 인코딩)
+        const data = new URLSearchParams(formData);
 
-// 구글 시트로 데이터 전송
+        // 구글 시트로 데이터 전송
         fetch(WEBAPP_URL, {
             method: 'POST',
-            body: formData,
-            mode: 'no-cors'  // 🔴 브라우저 보안 장벽을 통과하는 마법의 주문 추가!
+            body: data,
+            mode: 'no-cors' // 브라우저 보안 장벽 무사 통과
         })
         .then(() => {
-            // no-cors 모드에서는 응답을 읽지 않고 바로 성공으로 처리합니다.
             alert("✅ 아차사고 신고가 성공적으로 접수되었습니다. 안전에 기여해 주셔서 감사합니다!");
             form.reset(); // 입력창 초기화
         })
         .catch(error => {
-            alert("❌ 통신 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+            alert("❌ 통신 오류가 발생했습니다. 구글 주소가 정확한지 확인해 주세요.");
             console.error('Error:', error);
         })
         .finally(() => {
@@ -202,6 +204,5 @@
         });
     });
 </script>
-
 </body>
 </html>
