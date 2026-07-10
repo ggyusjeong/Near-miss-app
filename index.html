@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <!-- 모바일 화면에 딱 맞게 렌더링되도록 설정 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>아차사고 신고 🚨</title>
+    <style>
+        /* 앱 전체 기본 스타일 (모바일 앱처럼 깔끔하게) */
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 500px;
+            background-color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+            box-shadow: 0 0 15px rgba(0,0,0,0.05);
+        }
+        /* 헤더 스타일 */
+        h1 {
+            text-align: center;
+            color: #1a1a1a;
+            font-size: 24px;
+            margin-top: 10px;
+            margin-bottom: 30px;
+        }
+        /* 입력 폼 스타일 */
+        label {
+            font-weight: bold;
+            font-size: 14px;
+            color: #333;
+            display: block;
+            margin-bottom: 8px;
+        }
+        /* 라디오 버튼(장소 선택) 스타일 */
+        .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        .radio-item {
+            flex: 1 1 calc(50% - 10px);
+        }
+        .radio-item input[type="radio"] {
+            display: none;
+        }
+        .radio-item label {
+            display: block;
+            text-align: center;
+            padding: 12px 5px;
+            background-color: #f0f2f6;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: normal;
+            margin: 0;
+            transition: all 0.2s ease;
+        }
+        .radio-item input[type="radio"]:checked + label {
+            background-color: #ff4b4b;
+            color: white;
+            font-weight: bold;
+        }
+        /* 텍스트 입력창 스타일 */
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            box-sizing: border-box;
+            resize: none;
+            margin-bottom: 25px;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #ff4b4b;
+        }
+        /* 제출 버튼 스타일 */
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: #ff4b4b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 25px;
+            transition: background-color 0.2s;
+        }
+        button:active {
+            background-color: #e03e3e;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        /* 하단 안내 문구 스타일 */
+        .info-box {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 13px;
+            color: #555;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <h1>🚨 아차사고 신고</h1>
+
+    <form id="reportForm">
+        <!-- 발견 위치 (라디오 버튼 방식 채택) -->
+        <label>📍 발견 위치</label>
+        <div class="radio-group">
+            <div class="radio-item">
+                <input type="radio" id="loc1" name="location" value="A/V 조정실" required>
+                <label for="loc1">A/V 조정실</label>
+            </div>
+            <div class="radio-item">
+                <input type="radio" id="loc2" name="location" value="대관 시설(홀/로비)">
+                <label for="loc2">대관 시설</label>
+            </div>
+            <div class="radio-item">
+                <input type="radio" id="loc3" name="location" value="기계실">
+                <label for="loc3">기계실</label>
+            </div>
+            <div class="radio-item">
+                <input type="radio" id="loc4" name="location" value="주차장">
+                <label for="loc4">주차장</label>
+            </div>
+            <div class="radio-item">
+                <input type="radio" id="loc5" name="location" value="기타">
+                <label for="loc5">기타</label>
+            </div>
+        </div>
+
+        <!-- 신고 내용 -->
+        <label>📝 신고 내용</label>
+        <textarea name="content" placeholder="위험 요소를 상세히 적어주세요. (예: 2층 로비 천장에서 물이 샙니다)" required></textarea>
+
+        <!-- 제출 버튼 -->
+        <button type="submit" id="submitBtn">신고 제출하기</button>
+    </form>
+
+    <!-- 하단 설명 -->
+    <div class="info-box">
+        💡 <b>아차사고(Near Miss)란?</b><br>
+        작업자의 부상이나 장비 파손으로 이어질 뻔했던 상황으로, 방치 시 향후 중대재해로 발전할 수 있는 위험 요소입니다. 사소한 발견이 안전을 만듭니다!
+    </div>
+</div>
+
+<script>
+    // 🔴 중요: 여기에 선생님의 구글 앱스 스크립트 주소를 큰따옴표 안에 넣어주세요!
+    const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwV4eDFz89GDCnKCaUCVo-tUP8LYNirnuWwotldQXd3p9TNn0bSw0QwaX8IF-QU6fe0/exec";
+
+    const form = document.getElementById('reportForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault(); // 기본 새로고침 방지
+
+        // 버튼 상태 변경 (로딩 중)
+        submitBtn.innerText = "제출 중입니다...";
+        submitBtn.disabled = true;
+
+        // 폼 데이터 수집
+        const formData = new FormData(form);
+
+        // 구글 시트로 데이터 전송
+        fetch(WEBAPP_URL, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            alert("✅ 아차사고 신고가 성공적으로 접수되었습니다. 안전에 기여해 주셔서 감사합니다!");
+            form.reset(); // 입력창 초기화
+        })
+        .catch(error => {
+            alert("❌ 통신 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+            console.error('Error:', error);
+        })
+        .finally(() => {
+            // 버튼 상태 원상복구
+            submitBtn.innerText = "신고 제출하기";
+            submitBtn.disabled = false;
+        });
+    });
+</script>
+
+</body>
+</html>
