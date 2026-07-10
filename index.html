@@ -180,12 +180,14 @@
         // 폼 데이터 수집
         const formData = new FormData(form);
 
-        // 구글 시트로 데이터 전송
+// 구글 시트로 데이터 전송
         fetch(WEBAPP_URL, {
             method: 'POST',
-            body: formData
+            body: formData,
+            mode: 'no-cors'  // 🔴 브라우저 보안 장벽을 통과하는 마법의 주문 추가!
         })
-        .then(response => {
+        .then(() => {
+            // no-cors 모드에서는 응답을 읽지 않고 바로 성공으로 처리합니다.
             alert("✅ 아차사고 신고가 성공적으로 접수되었습니다. 안전에 기여해 주셔서 감사합니다!");
             form.reset(); // 입력창 초기화
         })
