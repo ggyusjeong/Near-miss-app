@@ -3,12 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <head>
-    <!-- ... -->
-    <!-- 사이렌 이모지를 파비콘으로 설정 -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚨</text></svg>">
-</head>
     <title>아차사고 신고</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚨</text></svg>">
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         
@@ -29,97 +25,32 @@
             box-sizing: border-box;
             box-shadow: 0 0 15px rgba(0,0,0,0.05);
         }
-        h1 {
-            text-align: center;
-            color: #1a1a1a;
-            font-size: 24px;
-            margin-top: 10px;
-            margin-bottom: 5px;
-        }
-        .subtitle {
-            text-align: center;
-            color: #666666;
-            font-size: 16px;
-            margin-bottom: 30px;
-        }
-        label {
-            font-weight: bold;
-            font-size: 14px;
-            color: #333;
-            display: block;
-            margin-bottom: 8px;
-        }
-        .radio-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 25px;
-        }
-        .radio-item {
-            flex: 1 1 calc(33.333% - 10px); /* 한 줄에 3개씩 배치 */
-        }
-        .radio-item input[type="radio"] {
-            display: none;
-        }
+        h1 { text-align: center; color: #1a1a1a; font-size: 24px; margin-top: 10px; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #666666; font-size: 16px; margin-bottom: 30px; }
+        label { font-weight: bold; font-size: 14px; color: #333; display: block; margin-bottom: 8px; }
+        .button-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 25px; }
+        .radio-item input[type="radio"] { display: none; }
         .radio-item label {
-            display: block;
-            text-align: center;
-            padding: 10px 2px;
-            background-color: #f0f2f6;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 13px;
-            margin: 0;
-            transition: all 0.2s ease;
+            display: block; text-align: center; padding: 18px 5px; background-color: #ffffff;
+            border: 2px solid #e1e4e8; border-radius: 12px; cursor: pointer;
+            font-size: 14px; font-weight: 600; color: #4a5568; transition: all 0.2s ease;
         }
         .radio-item input[type="radio"]:checked + label {
-            background-color: #ff4b4b;
-            color: white;
-            font-weight: bold;
+            background-color: #ff4b4b; color: white; border-color: #ff4b4b;
+            box-shadow: 0 4px 10px rgba(255, 75, 75, 0.3);
         }
         textarea {
-            width: 100%;
-            height: 120px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 15px;
-            box-sizing: border-box;
-            resize: none;
-            margin-bottom: 25px;
+            width: 100%; height: 120px; padding: 15px; border: 1px solid #ddd;
+            border-radius: 8px; font-size: 15px; box-sizing: border-box; resize: none; margin-bottom: 15px;
         }
-        textarea:focus {
-            outline: none;
-            border-color: #ff4b4b;
+        input[type="file"] {
+            width: 100%; padding: 10px; border: 1px dashed #bbb; border-radius: 8px;
+            background-color: #f9f9f9; margin-bottom: 25px; font-size: 14px; color: #555; cursor: pointer;
         }
         button {
-            width: 100%;
-            padding: 15px;
-            background-color: #ff4b4b;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-bottom: 25px;
-            transition: background-color 0.2s;
-        }
-        button:active {
-            background-color: #e03e3e;
-        }
-        button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-        .info-box {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            border-left: 5px solid #ff4b4b;
-            font-size: 13px;
-            color: #555;
-            line-height: 1.5;
+            width: 100%; padding: 15px; background-color: #ff4b4b; color: white;
+            border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;
+            margin-bottom: 25px; transition: background-color 0.2s;
         }
     </style>
 </head>
@@ -130,129 +61,86 @@
         <img src="logo.jpg" style="width: 60%; max-width: 200px; height: auto;">
     </div>
 
-    <!-- 🚨 아래는 기존 코드 -->
     <h1>아차사고 신고 🚨</h1>
     <div class="subtitle">위험 요소를 알려주세요!</div>
 
     <form id="reportForm">
-        <!-- 💡 파이썬 코드와 동일하게 장소 이름 맞춤 -->
-<label style="margin-bottom: 15px;">📍 발견 위치</label>
-<div class="button-group">
-    <div class="radio-item"><input type="radio" id="loc1" name="location" value="1층" required><label for="loc1">1층</label></div>
-    <div class="radio-item"><input type="radio" id="loc2" name="location" value="2층"><label for="loc2">2층</label></div>
-    <div class="radio-item"><input type="radio" id="loc3" name="location" value="3층"><label for="loc3">3층</label></div>
-    <div class="radio-item"><input type="radio" id="loc4" name="location" value="4층"><label for="loc4">4층</label></div>
-    <div class="radio-item"><input type="radio" id="loc5" name="location" value="별관"><label for="loc5">별관</label></div>
-    <div class="radio-item"><input type="radio" id="loc6" name="location" value="지상주차장"><label for="loc6">지상주차장</label></div>
-    <div class="radio-item"><input type="radio" id="loc7" name="location" value="지하주차장"><label for="loc7">지하주차장</label></div>
-    <div class="radio-item"><input type="radio" id="loc8" name="location" value="외곽"><label for="loc8">외곽</label></div>
-    <div class="radio-item"><input type="radio" id="loc9" name="location" value="기타"><label for="loc9">기타</label></div>
-</div>
+        <label style="margin-bottom: 15px;">📍 발견 위치</label>
+        <div class="button-group">
+            <div class="radio-item"><input type="radio" id="loc1" name="location" value="1층" required><label for="loc1">1층</label></div>
+            <div class="radio-item"><input type="radio" id="loc2" name="location" value="2층"><label for="loc2">2층</label></div>
+            <div class="radio-item"><input type="radio" id="loc3" name="location" value="3층"><label for="loc3">3층</label></div>
+            <div class="radio-item"><input type="radio" id="loc4" name="location" value="4층"><label for="loc4">4층</label></div>
+            <div class="radio-item"><input type="radio" id="loc5" name="location" value="별관"><label for="loc5">별관</label></div>
+            <div class="radio-item"><input type="radio" id="loc6" name="location" value="지상주차장"><label for="loc6">지상주차장</label></div>
+            <div class="radio-item"><input type="radio" id="loc7" name="location" value="지하주차장"><label for="loc7">지하주차장</label></div>
+            <div class="radio-item"><input type="radio" id="loc8" name="location" value="외곽"><label for="loc8">외곽</label></div>
+            <div class="radio-item"><input type="radio" id="loc9" name="location" value="기타"><label for="loc9">기타</label></div>
+        </div>
 
-<style>
-    /* 버튼 그룹 스타일 */
-    .button-group {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr); /* 3열 배치 */
-        gap: 10px;
-        margin-bottom: 25px;
-    }
-    .radio-item input[type="radio"] { display: none; }
-    .radio-item label {
-        display: block;
-        text-align: center;
-        padding: 18px 5px; /* 버튼 높이를 키워 누르기 쉽게 함 */
-        background-color: #ffffff;
-        border: 2px solid #e1e4e8;
-        border-radius: 12px;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 600;
-        color: #4a5568;
-        transition: all 0.2s ease;
-    }
-    /* 선택되었을 때 강조 스타일 */
-    .radio-item input[type="radio"]:checked + label {
-        background-color: #ff4b4b;
-        color: white;
-        border-color: #ff4b4b;
-        box-shadow: 0 4px 10px rgba(255, 75, 75, 0.3);
-    }
-</style>
-
-        <!-- 💡 핵심: name 속성을 "content"에서 "description"으로 수정! -->
         <label>📝 어떤 위험 요소가 있나요?</label>
         <textarea name="description" placeholder="예: 벽, 바닥 손상 등, 미끄러짐 위험, 부딪힘 위험 등" required></textarea>
 
+        <label>📸 현장 사진 첨부 (선택)</label>
+        <input type="file" id="photo" accept="image/*" capture="environment">
+
         <button type="submit" id="submitBtn">신고 제출하기</button>
     </form>
-
-    <div class="info-box">
-        <b>💡 아차사고(Near Miss)란?</b><br>
-        부상이나 질병으로 이어질 뻔했던 아슬아슬한 위험 상황을 뜻합니다. 동일하거나 유사한 위험 요인이 방치될 경우 향후 큰 중대재해로 발전할 수 있으므로, 사전에 위험 요소를 발굴하고 개선하는 것이 무엇보다 중요합니다.
-    </div>
 </div>
 
 <script>
-    // 🔴 구글 스크립트 주소를 꼭 다시 넣어주세요!
-    const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwV4eDFz89GDCnKCaUCVo-tUP8LYNirnuWwotldQXd3p9TNn0bSw0QwaX8IF-QU6fe0/exec";
+    const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwtLfsFluNE1ngS03QB6ewcNIy3PWoLQCaH1IcWDoQ0JywwZyHSPgDbxVkdQoDtDKfA/exec";
 
-    // 💡 한국 시간(KST)으로 현재 시간을 만들어주는 함수 (파이썬의 datetime 역할)
     function getKSTDateString() {
         const now = new Date();
         const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
         const kst = new Date(utc + (9 * 3600000));
-        
-        const yyyy = kst.getFullYear();
-        const mm = String(kst.getMonth() + 1).padStart(2, '0');
-        const dd = String(kst.getDate()).padStart(2, '0');
-        const hh = String(kst.getHours()).padStart(2, '0');
-        const min = String(kst.getMinutes()).padStart(2, '0');
-        const ss = String(kst.getSeconds()).padStart(2, '0');
-        
-        return `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
+        return kst.toISOString().replace('T', ' ').substring(0, 19);
     }
 
     const form = document.getElementById('reportForm');
-    const submitBtn = document.getElementById('submitBtn');
+    const photoInput = document.getElementById('photo');
 
     form.addEventListener('submit', function(e) {
-        e.preventDefault(); 
-
-        submitBtn.innerText = "제출 중입니다...";
-        submitBtn.disabled = true;
+        e.preventDefault();
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.innerText = "제출 중..."; submitBtn.disabled = true;
 
         const formData = new FormData(form);
-
-        // 💡 파이썬과 완벽히 동일한 구조로 데이터 박스(JSON)를 포장합니다!
         const payload = {
-            "date": getKSTDateString(),                 // 1. 한국 시간 추가
-            "location": formData.get('location'),       // 2. 위치
-            "description": formData.get('description')  // 3. 이름표 수정 완료
+            "date": getKSTDateString(),
+            "location": formData.get('location'),
+            "description": formData.get('description'),
+            "fileName": "", "mimeType": "", "fileData": ""
         };
 
+        const file = photoInput.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                payload.fileName = file.name;
+                payload.mimeType = file.type;
+                payload.fileData = event.target.result.split(',')[1];
+                sendData(payload);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            sendData(payload);
+        }
+    });
+
+    function sendData(payload) {
         fetch(WEBAPP_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: {
-                'Content-Type': 'text/plain;charset=utf-8' 
-            },
+            method: 'POST', mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify(payload)
         })
-        .then(() => {
-            alert("✅ 신고가 접수되었습니다! 안전한 환경을 만드는데 도움주셔서 감사합니다.");
-            form.reset(); 
-        })
-        .catch(error => {
-            alert("❌ 전송에 실패했습니다.");
-            console.error('Error:', error);
-        })
-        .finally(() => {
-            submitBtn.innerText = "신고 제출하기";
-            submitBtn.disabled = false;
+        .then(() => { alert("✅ 신고 완료!"); form.reset(); })
+        .finally(() => { 
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.innerText = "신고 제출하기"; submitBtn.disabled = false; 
         });
-    });
+    }
 </script>
-
 </body>
 </html>
