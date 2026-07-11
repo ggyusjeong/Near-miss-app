@@ -6,7 +6,9 @@
     <title>안전 상황판</title>
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-        body { font-family: 'Pretendard', sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; }
+        
+        /* 1. 전체 배경을 순백색(흰색)으로 변경 */
+        body { font-family: 'Pretendard', sans-serif; background-color: #ffffff; margin: 0; padding: 20px; }
         .container { max-width: 600px; margin: 0 auto; }
         
         /* 로고 및 제목 스타일 */
@@ -14,24 +16,26 @@
         .logo-img { max-width: 150px; margin-bottom: 10px; border-radius: 8px; }
         h1 { color: #1a1a1a; font-size: 22px; margin: 0; font-weight: 800; }
         
-        /* 로그인 화면 스타일 */
-        #login-screen { text-align: center; background: white; padding: 40px 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-top: 50px; }
-        #login-screen input { padding: 12px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px; width: 200px; text-align: center; margin-bottom: 15px; outline: none; }
+        /* 2. 로그인 화면 배경을 연회색으로 변경 */
+        #login-screen { text-align: center; background: #f4f6f9; padding: 40px 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-top: 50px; }
+        #login-screen input { padding: 12px; font-size: 16px; border: 2px solid #fff; border-radius: 8px; width: 200px; text-align: center; margin-bottom: 15px; outline: none; }
         #login-screen button { padding: 12px 30px; font-size: 16px; background: #333; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
         
         /* 대시보드 화면 및 요약 박스 */
         #dashboard-main { display: none; }
-        .summary-box { display: flex; justify-content: space-around; background: white; padding: 20px 10px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .summary-item { text-align: center; font-size: 14px; color: #666; font-weight: 600; width: 33%; border-right: 1px solid #eee; }
+        
+        /* 3. 요약 박스 배경을 연회색으로 변경 */
+        .summary-box { display: flex; justify-content: space-around; background: #f4f6f9; padding: 20px 10px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .summary-item { text-align: center; font-size: 14px; color: #666; font-weight: 600; width: 33%; border-right: 1px solid #e1e4e8; }
         .summary-item:last-child { border-right: none; }
         .summary-num { display: block; font-size: 24px; font-weight: 800; margin-top: 5px; }
         .num-new { color: #ff4b4b; }
         .num-ing { color: #ff9800; }
         .num-done { color: #4caf50; }
 
-        /* 리스트 카드 스타일 */
-        .report-card { background: white; border-radius: 12px; padding: 15px 20px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .report-header { display: flex; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 8px; flex-wrap: wrap; gap: 8px; }
+        /* 4. 리스트 카드 배경을 연회색으로 변경 */
+        .report-card { background: #f4f6f9; border-radius: 12px; padding: 15px 20px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .report-header { display: flex; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #e1e4e8; padding-bottom: 8px; flex-wrap: wrap; gap: 8px; }
         .location-badge { background: #333; color: white; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
         .date-text { color: #888; font-size: 12px; }
         
@@ -42,8 +46,12 @@
         .status-완료 { background: #4caf50; }
 
         .description { font-size: 15px; color: #333; line-height: 1.5; white-space: pre-wrap; }
-        .empty-msg { text-align: center; color: #888; padding: 30px; background: white; border-radius: 12px; }
-        .btn-home { display: block; width: 100%; text-align: center; background: #eee; color: #333; padding: 12px 0; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 20px; }
+        
+        /* 5. 데이터 없을 때 뜨는 메시지 박스도 연회색으로 */
+        .empty-msg { text-align: center; color: #888; padding: 30px; background: #f4f6f9; border-radius: 12px; }
+        
+        /* 돌아가기 버튼 디자인 */
+        .btn-home { display: block; width: 100%; text-align: center; background: #fff; color: #333; border: 1px solid #ddd; padding: 12px 0; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -85,25 +93,46 @@
 
     <script>
         // 🔴 웹앱 URL을 기존과 동일하게 꼭 넣어주세요!
-        const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxev7No0cR4LT2zangeNY79zQpi4OP3f-9ujmxWGSbq5VlO3vZCSaCJWjlpeufjMyKT/exec";
+        const WEBAPP_URL = "여기에_웹앱_URL을_넣으세요";
+        let autoRefreshTimer = null; // 자동 새로고침 타이머 변수
 
-        function checkPassword() {
+        // 페이지가 로드될 때 저장된 비밀번호 확인
+        window.onload = function() {
+            const savedPw = sessionStorage.getItem('dashboard_pw');
+            if (savedPw) {
+                document.getElementById('pw-input').value = savedPw;
+                checkPassword(true);
+            }
+        };
+
+        function checkPassword(isAutoLogin = false) {
             const pw = document.getElementById('pw-input').value;
             if (!pw) { alert("비밀번호를 입력해주세요."); return; }
 
             const loginBtn = document.getElementById('login-btn');
-            loginBtn.innerText = "확인 중..."; loginBtn.disabled = true;
+            if (!isAutoLogin) {
+                loginBtn.innerText = "확인 중..."; 
+                loginBtn.disabled = true;
+            }
 
             fetch(WEBAPP_URL + "?pw=" + encodeURIComponent(pw))
                 .then(response => response.json())
                 .then(data => {
                     if (data.error) {
-                        alert("❌ " + data.error);
+                        if (!isAutoLogin) alert("❌ " + data.error);
                         loginBtn.innerText = "접속하기"; loginBtn.disabled = false;
                         document.getElementById('pw-input').value = "";
+                        sessionStorage.removeItem('dashboard_pw');
+                        
+                        // 비밀번호 틀리면 타이머 중지
+                        if (autoRefreshTimer) clearInterval(autoRefreshTimer);
                         return;
                     }
 
+                    // 비밀번호 임시 저장
+                    sessionStorage.setItem('dashboard_pw', pw);
+
+                    // 로그인 화면 숨기고 대시보드 표시
                     document.getElementById('login-screen').style.display = 'none';
                     document.getElementById('dashboard-main').style.display = 'block';
                     
@@ -111,45 +140,50 @@
                     
                     if (data.length === 0) {
                         contentDiv.innerHTML = '<div class="empty-msg">아직 접수된 신고가 없습니다. 😊</div>';
-                        return;
+                    } else {
+                        let countNew = 0, countIng = 0, countDone = 0;
+                        
+                        const html = data.reverse().map(item => {
+                            const status = item.status ? item.status.trim() : "접수";
+                            if (status === "완료") countDone++;
+                            else if (status === "처리중") countIng++;
+                            else countNew++;
+
+                            const badgeClass = status === "완료" ? "status-완료" : (status === "처리중" ? "status-처리중" : "status-접수");
+                            const displayStatus = status === "완료" || status === "처리중" ? status : "접수";
+
+                            return `
+                            <div class="report-card">
+                                <div class="report-header">
+                                    <span class="location-badge">📍 ${item.location}</span>
+                                    <span class="date-text">${item.date}</span>
+                                    <span class="status-badge ${badgeClass}">${displayStatus}</span>
+                                </div>
+                                <div class="description">${item.description}</div>
+                            </div>
+                            `;
+                        }).join('');
+
+                        document.getElementById('count-new').innerText = countNew;
+                        document.getElementById('count-ing').innerText = countIng;
+                        document.getElementById('count-done').innerText = countDone;
+                        contentDiv.innerHTML = html;
                     }
 
-                    // 💡 상태 개수 카운트 로직
-                    let countNew = 0, countIng = 0, countDone = 0;
-                    
-                    // 최신순 정렬 후 HTML 카드 생성
-                    const html = data.reverse().map(item => {
-                        // 통계 계산
-                        const status = item.status.trim();
-                        if (status === "완료") countDone++;
-                        else if (status === "처리중") countIng++;
-                        else countNew++;
-
-                        // 뱃지 색상을 위한 클래스명 설정 (기본값은 '접수')
-                        const badgeClass = status === "완료" ? "status-완료" : (status === "처리중" ? "status-처리중" : "status-접수");
-                        const displayStatus = status === "완료" || status === "처리중" ? status : "접수";
-
-                        return `
-                        <div class="report-card">
-                            <div class="report-header">
-                                <span class="location-badge">📍 ${item.location}</span>
-                                <span class="date-text">${item.date}</span>
-                                <span class="status-badge ${badgeClass}">${displayStatus}</span>
-                            </div>
-                            <div class="description">${item.description}</div>
-                        </div>
-                        `;
-                    }).join('');
-
-                    // 화면에 데이터 렌더링
-                    document.getElementById('count-new').innerText = countNew;
-                    document.getElementById('count-ing').innerText = countIng;
-                    document.getElementById('count-done').innerText = countDone;
-                    contentDiv.innerHTML = html;
+                    // 💡 자동 새로고침 세팅 (최초 1회만 설정)
+                    if (!autoRefreshTimer) {
+                        // 60000 밀리초 = 60초(1분)
+                        autoRefreshTimer = setInterval(() => {
+                            console.log("최신 데이터 불러오는 중...");
+                            checkPassword(true);
+                        }, 60000); 
+                    }
                 })
                 .catch(error => {
-                    alert("⚠️ 데이터를 불러오는 중 오류가 발생했습니다.");
-                    loginBtn.innerText = "접속하기"; loginBtn.disabled = false;
+                    if (!isAutoLogin) {
+                        alert("⚠️ 데이터를 불러오는 중 오류가 발생했습니다.");
+                        loginBtn.innerText = "접속하기"; loginBtn.disabled = false;
+                    }
                 });
         }
     </script>
