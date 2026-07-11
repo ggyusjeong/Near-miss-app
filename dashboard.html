@@ -8,22 +8,40 @@
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         body { font-family: 'Pretendard', sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; }
         .container { max-width: 600px; margin: 0 auto; }
-        h1 { text-align: center; color: #1a1a1a; font-size: 24px; margin-bottom: 20px; }
+        
+        /* 로고 및 제목 스타일 */
+        .header-section { text-align: center; margin-bottom: 20px; }
+        .logo-img { max-width: 150px; margin-bottom: 10px; border-radius: 8px; }
+        h1 { color: #1a1a1a; font-size: 22px; margin: 0; font-weight: 800; }
         
         /* 로그인 화면 스타일 */
         #login-screen { text-align: center; background: white; padding: 40px 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-top: 50px; }
-        #login-screen input { padding: 12px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px; width: 200px; text-align: center; margin-bottom: 15px; outline: none; transition: 0.2s; }
-        #login-screen input:focus { border-color: #333; }
+        #login-screen input { padding: 12px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px; width: 200px; text-align: center; margin-bottom: 15px; outline: none; }
         #login-screen button { padding: 12px 30px; font-size: 16px; background: #333; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
         
-        /* 대시보드 화면 스타일 (초기에는 숨김) */
+        /* 대시보드 화면 및 요약 박스 */
         #dashboard-main { display: none; }
+        .summary-box { display: flex; justify-content: space-around; background: white; padding: 20px 10px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .summary-item { text-align: center; font-size: 14px; color: #666; font-weight: 600; width: 33%; border-right: 1px solid #eee; }
+        .summary-item:last-child { border-right: none; }
+        .summary-num { display: block; font-size: 24px; font-weight: 800; margin-top: 5px; }
+        .num-new { color: #ff4b4b; }
+        .num-ing { color: #ff9800; }
+        .num-done { color: #4caf50; }
+
+        /* 리스트 카드 스타일 */
         .report-card { background: white; border-radius: 12px; padding: 15px 20px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .report-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
-        .location-badge { background: #ff4b4b; color: white; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .report-header { display: flex; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 8px; flex-wrap: wrap; gap: 8px; }
+        .location-badge { background: #333; color: white; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
         .date-text { color: #888; font-size: 12px; }
+        
+        /* 상태 뱃지 색상 */
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; color: white; margin-left: auto; }
+        .status-접수 { background: #ff4b4b; }
+        .status-처리중 { background: #ff9800; }
+        .status-완료 { background: #4caf50; }
+
         .description { font-size: 15px; color: #333; line-height: 1.5; white-space: pre-wrap; }
-        .loading { text-align: center; color: #666; padding: 20px; font-weight: bold; }
         .empty-msg { text-align: center; color: #888; padding: 30px; background: white; border-radius: 12px; }
         .btn-home { display: block; width: 100%; text-align: center; background: #eee; color: #333; padding: 12px 0; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 20px; }
     </style>
@@ -33,6 +51,7 @@
         
         <!-- 🔒 로그인 화면 -->
         <div id="login-screen">
+            <img src="logo.jpg" alt="로고" class="logo-img" onerror="this.style.display='none'">
             <h2>🔒 관리자 대시보드</h2>
             <p style="color:#666; font-size:14px; margin-bottom:20px;">비밀번호를 입력해주세요.</p>
             <input type="password" id="pw-input" placeholder="비밀번호" onkeypress="if(event.keyCode==13) checkPassword()">
@@ -40,19 +59,32 @@
             <button onclick="checkPassword()" id="login-btn">접속하기</button>
         </div>
 
-        <!-- 📊 대시보드 화면 (성공 시 표시) -->
+        <!-- 📊 대시보드 화면 -->
         <div id="dashboard-main">
-            <h1>🚨 실시간 안전 상황판</h1>
-            <div id="dashboard-content">
-                <div class="loading">데이터를 불러오는 중입니다... ⏳</div>
+            <div class="header-section">
+                <!-- 깃허브에 있는 logo.jpg 파일을 불러옵니다 -->
+                <img src="logo.jpg" alt="로고" class="logo-img" onerror="this.style.display='none'">
+                <h1>실시간 아차사고 신고 현황판</h1>
             </div>
+
+            <!-- 요약 현황판 -->
+            <div class="summary-box">
+                <div class="summary-item">접수<span class="summary-num num-new" id="count-new">0</span></div>
+                <div class="summary-item">처리중<span class="summary-num num-ing" id="count-ing">0</span></div>
+                <div class="summary-item">완료<span class="summary-num num-done" id="count-done">0</span></div>
+            </div>
+
+            <!-- 상세 내역 리스트 -->
+            <div id="dashboard-content">
+                <div style="text-align: center; color: #666; padding: 20px; font-weight: bold;">데이터를 불러오는 중입니다... ⏳</div>
+            </div>
+            
             <a href="index.html" class="btn-home">⬅️ 신고 페이지로 돌아가기</a>
         </div>
-
     </div>
 
     <script>
-        // 🔴 웹앱 URL을 꼭 넣어주세요!
+        // 🔴 웹앱 URL을 기존과 동일하게 꼭 넣어주세요!
         const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxev7No0cR4LT2zangeNY79zQpi4OP3f-9ujmxWGSbq5VlO3vZCSaCJWjlpeufjMyKT/exec";
 
         function checkPassword() {
@@ -60,50 +92,64 @@
             if (!pw) { alert("비밀번호를 입력해주세요."); return; }
 
             const loginBtn = document.getElementById('login-btn');
-            loginBtn.innerText = "확인 중...";
-            loginBtn.disabled = true;
+            loginBtn.innerText = "확인 중..."; loginBtn.disabled = true;
 
-            // 웹앱 주소 뒤에 "?pw=비밀번호"를 붙여서 요청합니다.
             fetch(WEBAPP_URL + "?pw=" + encodeURIComponent(pw))
                 .then(response => response.json())
                 .then(data => {
                     if (data.error) {
-                        // 비밀번호가 틀린 경우
                         alert("❌ " + data.error);
-                        loginBtn.innerText = "접속하기";
-                        loginBtn.disabled = false;
+                        loginBtn.innerText = "접속하기"; loginBtn.disabled = false;
                         document.getElementById('pw-input').value = "";
                         return;
                     }
 
-                    // 비밀번호가 맞은 경우: 로그인 화면 숨기고 대시보드 띄우기
                     document.getElementById('login-screen').style.display = 'none';
                     document.getElementById('dashboard-main').style.display = 'block';
                     
                     const contentDiv = document.getElementById('dashboard-content');
                     
                     if (data.length === 0) {
-                        contentDiv.innerHTML = '<div class="empty-msg">아직 접수된 신고가 없습니다. 안전한 하루네요! 😊</div>';
+                        contentDiv.innerHTML = '<div class="empty-msg">아직 접수된 신고가 없습니다. 😊</div>';
                         return;
                     }
 
-                    // 데이터 화면에 뿌리기
-                    const html = data.reverse().map(item => `
+                    // 💡 상태 개수 카운트 로직
+                    let countNew = 0, countIng = 0, countDone = 0;
+                    
+                    // 최신순 정렬 후 HTML 카드 생성
+                    const html = data.reverse().map(item => {
+                        // 통계 계산
+                        const status = item.status.trim();
+                        if (status === "완료") countDone++;
+                        else if (status === "처리중") countIng++;
+                        else countNew++;
+
+                        // 뱃지 색상을 위한 클래스명 설정 (기본값은 '접수')
+                        const badgeClass = status === "완료" ? "status-완료" : (status === "처리중" ? "status-처리중" : "status-접수");
+                        const displayStatus = status === "완료" || status === "처리중" ? status : "접수";
+
+                        return `
                         <div class="report-card">
                             <div class="report-header">
                                 <span class="location-badge">📍 ${item.location}</span>
                                 <span class="date-text">${item.date}</span>
+                                <span class="status-badge ${badgeClass}">${displayStatus}</span>
                             </div>
                             <div class="description">${item.description}</div>
                         </div>
-                    `).join('');
+                        `;
+                    }).join('');
 
+                    // 화면에 데이터 렌더링
+                    document.getElementById('count-new').innerText = countNew;
+                    document.getElementById('count-ing').innerText = countIng;
+                    document.getElementById('count-done').innerText = countDone;
                     contentDiv.innerHTML = html;
                 })
                 .catch(error => {
                     alert("⚠️ 데이터를 불러오는 중 오류가 발생했습니다.");
-                    loginBtn.innerText = "접속하기";
-                    loginBtn.disabled = false;
+                    loginBtn.innerText = "접속하기"; loginBtn.disabled = false;
                 });
         }
     </script>
