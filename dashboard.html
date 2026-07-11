@@ -7,24 +7,23 @@
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         
-        /* 1. 전체 배경을 순백색(흰색)으로 변경 */
+        /* 전체 배경: 순백색 */
         body { font-family: 'Pretendard', sans-serif; background-color: #ffffff; margin: 0; padding: 20px; }
         .container { max-width: 600px; margin: 0 auto; }
         
-        /* 로고 및 제목 스타일 */
+        /* 로고 및 제목 */
         .header-section { text-align: center; margin-bottom: 20px; }
         .logo-img { max-width: 150px; margin-bottom: 10px; border-radius: 8px; }
         h1 { color: #1a1a1a; font-size: 22px; margin: 0; font-weight: 800; }
         
-        /* 2. 로그인 화면 배경을 연회색으로 변경 */
-        #login-screen { text-align: center; background: #f4f6f9; padding: 40px 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-top: 50px; }
-        #login-screen input { padding: 12px; font-size: 16px; border: 2px solid #fff; border-radius: 8px; width: 200px; text-align: center; margin-bottom: 15px; outline: none; }
+        /* 🎨 로그인 화면 색상 반전 (박스는 흰색, 입력창은 연회색) */
+        #login-screen { text-align: center; background: #ffffff; padding: 40px 20px; border-radius: 12px; border: 1px solid #eee; margin-top: 50px; }
+        #login-screen input { padding: 12px; font-size: 16px; background: #f4f6f9; border: 1px solid #e1e4e8; border-radius: 8px; width: 200px; text-align: center; margin-bottom: 15px; outline: none; }
+        #login-screen input:focus { border-color: #333; }
         #login-screen button { padding: 12px 30px; font-size: 16px; background: #333; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
         
-        /* 대시보드 화면 및 요약 박스 */
+        /* 대시보드 화면 및 요약 박스 (연회색) */
         #dashboard-main { display: none; }
-        
-        /* 3. 요약 박스 배경을 연회색으로 변경 */
         .summary-box { display: flex; justify-content: space-around; background: #f4f6f9; padding: 20px 10px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .summary-item { text-align: center; font-size: 14px; color: #666; font-weight: 600; width: 33%; border-right: 1px solid #e1e4e8; }
         .summary-item:last-child { border-right: none; }
@@ -33,24 +32,20 @@
         .num-ing { color: #ff9800; }
         .num-done { color: #4caf50; }
 
-        /* 4. 리스트 카드 배경을 연회색으로 변경 */
+        /* 리스트 카드 (연회색) */
         .report-card { background: #f4f6f9; border-radius: 12px; padding: 15px 20px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .report-header { display: flex; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #e1e4e8; padding-bottom: 8px; flex-wrap: wrap; gap: 8px; }
         .location-badge { background: #333; color: white; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
         .date-text { color: #888; font-size: 12px; }
         
-        /* 상태 뱃지 색상 */
+        /* 상태 뱃지 */
         .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; color: white; margin-left: auto; }
         .status-접수 { background: #ff4b4b; }
         .status-처리중 { background: #ff9800; }
         .status-완료 { background: #4caf50; }
 
         .description { font-size: 15px; color: #333; line-height: 1.5; white-space: pre-wrap; }
-        
-        /* 5. 데이터 없을 때 뜨는 메시지 박스도 연회색으로 */
         .empty-msg { text-align: center; color: #888; padding: 30px; background: #f4f6f9; border-radius: 12px; }
-        
-        /* 돌아가기 버튼 디자인 */
         .btn-home { display: block; width: 100%; text-align: center; background: #fff; color: #333; border: 1px solid #ddd; padding: 12px 0; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 20px; }
     </style>
 </head>
@@ -70,19 +65,16 @@
         <!-- 📊 대시보드 화면 -->
         <div id="dashboard-main">
             <div class="header-section">
-                <!-- 깃허브에 있는 logo.jpg 파일을 불러옵니다 -->
                 <img src="logo.jpg" alt="로고" class="logo-img" onerror="this.style.display='none'">
                 <h1>실시간 아차사고 신고 현황판</h1>
             </div>
 
-            <!-- 요약 현황판 -->
             <div class="summary-box">
                 <div class="summary-item">접수<span class="summary-num num-new" id="count-new">0</span></div>
                 <div class="summary-item">처리중<span class="summary-num num-ing" id="count-ing">0</span></div>
                 <div class="summary-item">완료<span class="summary-num num-done" id="count-done">0</span></div>
             </div>
 
-            <!-- 상세 내역 리스트 -->
             <div id="dashboard-content">
                 <div style="text-align: center; color: #666; padding: 20px; font-weight: bold;">데이터를 불러오는 중입니다... ⏳</div>
             </div>
@@ -92,22 +84,34 @@
     </div>
 
     <script>
-        // 🔴 웹앱 URL을 기존과 동일하게 꼭 넣어주세요!
+        // 🔴 반드시 사용 중이신 웹앱 URL로 변경해 주세요!
         const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxev7No0cR4LT2zangeNY79zQpi4OP3f-9ujmxWGSbq5VlO3vZCSaCJWjlpeufjMyKT/exec";
-        let autoRefreshTimer = null; // 자동 새로고침 타이머 변수
+        let autoRefreshTimer = null;
 
-        // 페이지가 로드될 때 저장된 비밀번호 확인
-        window.onload = function() {
-            const savedPw = sessionStorage.getItem('dashboard_pw');
+        // 💡 페이지 로드 완료 즉시 실행
+        document.addEventListener("DOMContentLoaded", function() {
+            // sessionStorage 대신 더 강력한 localStorage 사용
+            const savedPw = localStorage.getItem('dashboard_pw');
             if (savedPw) {
                 document.getElementById('pw-input').value = savedPw;
+                
+                // 로그인 화면을 아예 숨기고 시작 (깜빡임 방지)
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('dashboard-main').style.display = 'block';
+                
                 checkPassword(true);
             }
-        };
+        });
 
         function checkPassword(isAutoLogin = false) {
-            const pw = document.getElementById('pw-input').value;
-            if (!pw) { alert("비밀번호를 입력해주세요."); return; }
+            let pw = document.getElementById('pw-input').value;
+            // 입력창이 비어있으면 로컬 스토리지에서 한 번 더 가져옵니다.
+            if (!pw && isAutoLogin) pw = localStorage.getItem('dashboard_pw');
+            
+            if (!pw) { 
+                alert("비밀번호를 입력해주세요."); 
+                return; 
+            }
 
             const loginBtn = document.getElementById('login-btn');
             if (!isAutoLogin) {
@@ -120,19 +124,23 @@
                 .then(data => {
                     if (data.error) {
                         if (!isAutoLogin) alert("❌ " + data.error);
+                        
+                        // 에러 시 UI 초기화
                         loginBtn.innerText = "접속하기"; loginBtn.disabled = false;
                         document.getElementById('pw-input').value = "";
-                        sessionStorage.removeItem('dashboard_pw');
+                        localStorage.removeItem('dashboard_pw');
                         
-                        // 비밀번호 틀리면 타이머 중지
+                        // 자동 로그인 실패 시 로그인 화면 다시 띄우기
+                        document.getElementById('dashboard-main').style.display = 'none';
+                        document.getElementById('login-screen').style.display = 'block';
+                        
                         if (autoRefreshTimer) clearInterval(autoRefreshTimer);
                         return;
                     }
 
-                    // 비밀번호 임시 저장
-                    sessionStorage.setItem('dashboard_pw', pw);
+                    // 💡 비밀번호를 내 컴퓨터(브라우저)에 영구 저장
+                    localStorage.setItem('dashboard_pw', pw);
 
-                    // 로그인 화면 숨기고 대시보드 표시
                     document.getElementById('login-screen').style.display = 'none';
                     document.getElementById('dashboard-main').style.display = 'block';
                     
@@ -170,11 +178,9 @@
                         contentDiv.innerHTML = html;
                     }
 
-                    // 💡 자동 새로고침 세팅 (최초 1회만 설정)
+                    // 1분(60초)마다 자동 새로고침 설정
                     if (!autoRefreshTimer) {
-                        // 60000 밀리초 = 60초(1분)
                         autoRefreshTimer = setInterval(() => {
-                            console.log("최신 데이터 불러오는 중...");
                             checkPassword(true);
                         }, 60000); 
                     }
