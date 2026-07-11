@@ -102,14 +102,11 @@
         const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxev7No0cR4LT2zangeNY79zQpi4OP3f-9ujmxWGSbq5VlO3vZCSaCJWjlpeufjMyKT/exec";
         let autoRefreshTimer = null;
 
-        // 💡 페이지 로드 완료 즉시 실행
         document.addEventListener("DOMContentLoaded", function() {
-            // sessionStorage 대신 더 강력한 localStorage 사용
             const savedPw = localStorage.getItem('dashboard_pw');
             if (savedPw) {
                 document.getElementById('pw-input').value = savedPw;
                 
-                // 로그인 화면을 아예 숨기고 시작 (깜빡임 방지)
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('dashboard-main').style.display = 'block';
                 
@@ -119,7 +116,6 @@
 
         function checkPassword(isAutoLogin = false) {
             let pw = document.getElementById('pw-input').value;
-            // 입력창이 비어있으면 로컬 스토리지에서 한 번 더 가져옵니다.
             if (!pw && isAutoLogin) pw = localStorage.getItem('dashboard_pw');
             
             if (!pw) { 
@@ -133,18 +129,19 @@
                 loginBtn.disabled = true;
             }
 
-            fetch(WEBAPP_URL + "?pw=" + encodeURIComponent(pw))
+            // 💡 [핵심] 브라우저가 예전 화면을 띄우지 못하도록 URL 뒤에 현재 시간(난수)을 붙여서 강제로 최신 데이터를 가져옵니다.
+            const fetchUrl = WEBAPP_URL + "?pw=" + encodeURIComponent(pw) + "&t=" + new Date().getTime();
+
+            fetch(fetchUrl)
                 .then(response => response.json())
                 .then(data => {
                     if (data.error) {
                         if (!isAutoLogin) alert("❌ " + data.error);
                         
-                        // 에러 시 UI 초기화
                         loginBtn.innerText = "접속하기"; loginBtn.disabled = false;
                         document.getElementById('pw-input').value = "";
                         localStorage.removeItem('dashboard_pw');
                         
-                        // 자동 로그인 실패 시 로그인 화면 다시 띄우기
                         document.getElementById('dashboard-main').style.display = 'none';
                         document.getElementById('login-screen').style.display = 'block';
                         
@@ -152,7 +149,6 @@
                         return;
                     }
 
-                    // 💡 비밀번호를 내 컴퓨터(브라우저)에 영구 저장
                     localStorage.setItem('dashboard_pw', pw);
 
                     document.getElementById('login-screen').style.display = 'none';
@@ -160,19 +156,32 @@
                     
                     const contentDiv = document.getElementById('dashboard-content');
                     
+                    // 💡 통계 변수 초기화 (데이터가 0개일 때도 모두 0으로 덮어씌우기 위함)
+                    let countNew = 0, countIng = 0, countDone = 0;
+                    
                     if (data.length === 0) {
                         contentDiv.innerHTML = '<div class="empty-msg">아직 접수된 신고가 없습니다. 😊</div>';
                     } else {
-                        let countNew = 0, countIng = 0, countDone = 0;
-                        
                         const html = data.reverse().map(item => {
-                            const status = item.status ? item.status.trim() : "접수";
-                            if (status === "완료") countDone++;
-                            else if (status === "처리중") countIng++;
-                            else countNew++;
+                            // 💡 [핵심] 구글 시트에 띄어쓰기가 들어갔을 경우를 대비해 모든 공백을 강제로 지우고 검사합니다.
+                            const rawStatus = item.status ? item.status.toString().replace(/\s/g, "") : "접수";
+                            
+                            let displayStatus = "접수";
+                            let badgeClass = "status-접수";
 
-                            const badgeClass = status === "완료" ? "status-완료" : (status === "처리중" ? "status-처리중" : "status-접수");
-                            const displayStatus = status === "완료" || status === "처리중" ? status : "접수";
+                            if (rawStatus.includes("완료")) {
+                                countDone++;
+                                displayStatus = "완료";
+                                badgeClass = "status-완료";
+                            } else if (rawStatus.includes("처리중")) {
+                                countIng++;
+                                displayStatus = "처리중";
+                                badgeClass = "status-처리중";
+                            } else {
+                                countNew++;
+                                displayStatus = "접수";
+                                badgeClass = "status-접수";
+                            }
 
                             return `
                             <div class="report-card">
@@ -186,13 +195,14 @@
                             `;
                         }).join('');
 
-                        document.getElementById('count-new').innerText = countNew;
-                        document.getElementById('count-ing').innerText = countIng;
-                        document.getElementById('count-done').innerText = countDone;
                         contentDiv.innerHTML = html;
                     }
 
-                    // 1분(60초)마다 자동 새로고침 설정
+                    // 💡 [핵심] 계산된 최종 숫자를 HTML 통계판에 덮어씌웁니다.
+                    document.getElementById('count-new').innerText = countNew;
+                    document.getElementById('count-ing').innerText = countIng;
+                    document.getElementById('count-done').innerText = countDone;
+
                     if (!autoRefreshTimer) {
                         autoRefreshTimer = setInterval(() => {
                             checkPassword(true);
