@@ -35,7 +35,6 @@
         .location-badge { background: #333; color: white; padding: 4px 10px; border-radius: 20px; font-size: 13px; font-weight: bold; }
         .date-text { color: #888; font-size: 12px; }
         
-        /* 💡 상태 뱃지에 마우스를 올리면 클릭 가능함을 표시합니다 */
         .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; color: white; margin-left: auto; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         .status-badge:hover { opacity: 0.8; transform: scale(1.05); }
         .status-접수 { background: #ff4b4b; }
@@ -47,11 +46,30 @@
         
         .btn-home { display: block; width: 200px; margin: 40px auto 0 auto; text-align: center; background: #fff; color: #333; border: 1px solid #ddd; padding: 12px 0; border-radius: 8px; text-decoration: none; font-weight: bold; transition: 0.2s; }
         .btn-home:hover { background: #f4f6f9; }
+
+        /* 💡 커스텀 모달 팝업 디자인 */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; justify-content: center; align-items: center; backdrop-filter: blur(3px); }
+        .modal-box { background: white; padding: 30px 25px; border-radius: 16px; width: 280px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
+        .modal-box h3 { margin-top: 0; color: #333; font-size: 20px; margin-bottom: 20px; }
+        
+        /* 비밀번호 입력 섹션 */
+        #modal-pw-section input { width: 90%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; outline: none; text-align: center; font-size: 16px; }
+        #modal-pw-section button { background: #333; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; font-size: 16px; }
+        
+        /* 버튼 선택 섹션 */
+        .modal-buttons { display: flex; flex-direction: column; gap: 10px; }
+        .m-btn { border: none; padding: 14px; border-radius: 8px; font-weight: bold; color: white; cursor: pointer; font-size: 16px; transition: 0.2s; }
+        .m-btn:hover { transform: scale(1.02); filter: brightness(1.1); }
+        .m-접수 { background: #ff4b4b; }
+        .m-처리중 { background: #ff9800; }
+        .m-완료 { background: #4caf50; }
+        
+        .btn-modal-close { margin-top: 20px; background: transparent; border: none; color: #888; font-size: 14px; cursor: pointer; padding: 5px; }
+        .btn-modal-close:hover { color: #333; text-decoration: underline; }
     </style>
 </head>
 <body>
     <div class="container">
-        
         <!-- 로그인 화면 -->
         <div id="login-screen">
             <img src="logo.jpg" alt="로고" class="logo-img" onerror="this.style.display='none'">
@@ -83,10 +101,34 @@
         </div>
     </div>
 
+    <!-- 💡 새로운 커스텀 상태 변경 팝업창 -->
+    <div id="custom-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h3 id="modal-title">⚙️ 상태 변경</h3>
+            
+            <div id="modal-pw-section" style="display:none;">
+                <p style="font-size:14px; color:#666; margin-bottom:15px;">관리자 비밀번호를 입력하세요.</p>
+                <input type="password" id="edit-pw-input" placeholder="비밀번호" onkeypress="if(event.keyCode==13) savePwAndShowButtons()">
+                <button onclick="savePwAndShowButtons()">확인</button>
+            </div>
+
+            <div id="modal-btn-section" style="display:none;">
+                <div class="modal-buttons">
+                    <button class="m-btn m-접수" onclick="sendUpdate('접수')">접수</button>
+                    <button class="m-btn m-처리중" onclick="sendUpdate('처리중')">처리중</button>
+                    <button class="m-btn m-완료" onclick="sendUpdate('완료')">완료</button>
+                </div>
+            </div>
+
+            <button class="btn-modal-close" onclick="closeModal()">취소 및 닫기</button>
+        </div>
+    </div>
+
     <script>
         // 🔴 웹앱 URL을 입력해 주세요!
         const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxev7No0cR4LT2zangeNY79zQpi4OP3f-9ujmxWGSbq5VlO3vZCSaCJWjlpeufjMyKT/exec";
         let autoRefreshTimer = null;
+        let targetRow = null; // 상태를 변경할 시트의 행 번호 기억
 
         document.addEventListener("DOMContentLoaded", function() {
             const savedPw = localStorage.getItem('dashboard_pw');
@@ -101,7 +143,6 @@
         function checkPassword(isAutoLogin = false) {
             let pw = document.getElementById('pw-input').value;
             if (!pw && isAutoLogin) pw = localStorage.getItem('dashboard_pw');
-            
             if (!pw) return;
 
             const fetchUrl = WEBAPP_URL + "?pw=" + encodeURIComponent(pw) + "&t=" + new Date().getTime();
@@ -141,13 +182,13 @@
                                 countNew++; displayStatus = "접수"; badgeClass = "status-접수";
                             }
 
-                            // 💡 배지를 클릭하면 상태 변경 함수(updateStatus)가 실행되도록 세팅
+                            // 버튼을 누르면 openModal 함수 실행
                             return `
                             <div class="report-card">
                                 <div class="report-header">
                                     <span class="location-badge">📍 ${item.location}</span>
                                     <span class="date-text">${item.date}</span>
-                                    <span class="status-badge ${badgeClass}" onclick="updateStatus(${item.row}, '${displayStatus}')" title="상태 변경 (클릭)">${displayStatus} 🔄</span>
+                                    <span class="status-badge ${badgeClass}" onclick="openModal(${item.row})" title="상태 변경 (클릭)">${displayStatus} 🔄</span>
                                 </div>
                                 <div class="description">${item.description}</div>
                             </div>
@@ -167,34 +208,48 @@
                 });
         }
 
-        // 💡 [핵심] 상태 변경 버튼 클릭 시 실행되는 함수
-        function updateStatus(rowId, currentStatus) {
-            // 1. 상태 변경 전용 비밀번호가 저장되어 있는지 확인
+        // 💡 [새로운 로직] 커스텀 팝업창 열기
+        function openModal(rowId) {
+            targetRow = rowId;
+            document.getElementById('custom-modal').style.display = 'flex';
+            
             let editPw = localStorage.getItem('dashboard_edit_pw');
-            
             if (!editPw) {
-                editPw = prompt("상태 변경을 위한 '관리자 비밀번호'를 입력하세요:");
-                if (!editPw) return; // 취소 누르면 종료
+                // 관리자 비밀번호가 없으면 입력창 표시
+                document.getElementById('modal-pw-section').style.display = 'block';
+                document.getElementById('modal-btn-section').style.display = 'none';
+                document.getElementById('edit-pw-input').focus();
+            } else {
+                // 이미 인증되었다면 바로 버튼 3개 표시
+                document.getElementById('modal-pw-section').style.display = 'none';
+                document.getElementById('modal-btn-section').style.display = 'block';
             }
+        }
 
-            // 2. 바꿀 상태 입력받기 (오타 방지를 위해 예시 제공)
-            let newStatus = prompt(`현재 상태: [${currentStatus}]\n\n변경할 상태를 정확히 입력하세요.\n(접수, 처리중, 완료 중 택 1)`, currentStatus);
-            if (!newStatus) return; // 취소 누르면 종료
+        function savePwAndShowButtons() {
+            const pw = document.getElementById('edit-pw-input').value;
+            if(!pw) { alert("비밀번호를 입력해주세요."); return; }
             
-            newStatus = newStatus.replace(/\s/g, ""); // 공백 제거
-            if (newStatus !== "접수" && newStatus !== "처리중" && newStatus !== "완료") {
-                alert("⚠️ '접수', '처리중', '완료' 중 하나만 입력해주세요.");
-                return;
-            }
+            // 임시로 저장하고 버튼 화면으로 전환
+            localStorage.setItem('dashboard_edit_pw', pw);
+            document.getElementById('modal-pw-section').style.display = 'none';
+            document.getElementById('modal-btn-section').style.display = 'block';
+        }
 
-            if (newStatus === currentStatus) return; // 상태가 그대로면 서버에 안 보냄
+        // 상태를 서버로 전송
+        function sendUpdate(newStatus) {
+            let editPw = localStorage.getItem('dashboard_edit_pw');
+            if(!editPw) return;
 
-            // 3. 서버(앱스 스크립트)로 변경 데이터 전송
+            // 로딩 처리
+            document.getElementById('modal-title').innerText = "업데이트 중... ⏳";
+            document.getElementById('modal-btn-section').style.display = 'none';
+
             fetch(WEBAPP_URL, {
                 method: 'POST',
                 body: JSON.stringify({
                     action: "update_status",
-                    row: rowId,
+                    row: targetRow,
                     status: newStatus,
                     edit_pw: editPw
                 })
@@ -203,15 +258,24 @@
             .then(resData => {
                 if (resData.status === "error") {
                     alert("❌ " + resData.message);
-                    localStorage.removeItem('dashboard_edit_pw'); // 비밀번호 틀리면 기억 삭제
+                    localStorage.removeItem('dashboard_edit_pw'); // 틀리면 기억 삭제
+                    closeModal();
                 } else {
-                    localStorage.setItem('dashboard_edit_pw', editPw); // 성공 시 비밀번호 기억
-                    checkPassword(true); // 성공 즉시 화면 새로고침하여 반영
+                    closeModal();
+                    checkPassword(true); // 성공 즉시 대시보드 갱신
                 }
             })
             .catch(err => {
                 alert("⚠️ 통신 오류가 발생했습니다.");
+                closeModal();
             });
+        }
+
+        // 팝업창 닫기 초기화
+        function closeModal() {
+            document.getElementById('custom-modal').style.display = 'none';
+            document.getElementById('modal-title').innerText = "⚙️ 상태 변경";
+            document.getElementById('edit-pw-input').value = "";
         }
     </script>
 </body>
