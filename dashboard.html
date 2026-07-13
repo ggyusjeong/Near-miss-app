@@ -7,25 +7,18 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚨</text></svg>">
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-        
-        /* 전체 배경 */
         body { font-family: 'Pretendard', sans-serif; background-color: #ffffff; margin: 0; padding: 20px; }
-        
-        /* 💡 컨테이너 넓이를 최대 1400px로 넓히고 여백을 조정합니다 */
         .container { max-width: 1400px; margin: 0 auto; }
         
-        /* 로고 및 제목 */
         .header-section { text-align: center; margin-bottom: 30px; }
         .logo-img { max-width: 150px; margin-bottom: 10px; border-radius: 8px; }
         h1 { color: #1a1a1a; font-size: 26px; margin: 0; font-weight: 800; }
         
-        /* 로그인 화면 (로그인 창은 너무 넓어지지 않게 고정) */
         #login-screen { text-align: center; background: #ffffff; padding: 40px 20px; border-radius: 12px; border: 1px solid #eee; margin-top: 10vh; max-width: 400px; margin-left: auto; margin-right: auto; }
         #login-screen input { padding: 12px; font-size: 16px; background: #f4f6f9; border: 1px solid #e1e4e8; border-radius: 8px; width: 250px; text-align: center; margin-bottom: 15px; outline: none; }
         #login-screen input:focus { border-color: #333; }
         #login-screen button { padding: 12px 30px; font-size: 16px; background: #333; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 276px; }
         
-        /* 대시보드 화면 및 요약 박스 */
         #dashboard-main { display: none; }
         .summary-box { display: flex; justify-content: space-around; background: #f4f6f9; padding: 20px 10px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .summary-item { text-align: center; font-size: 16px; color: #666; font-weight: 600; width: 33%; border-right: 1px solid #e1e4e8; }
@@ -35,22 +28,16 @@
         .num-ing { color: #ff9800; }
         .num-done { color: #4caf50; }
 
-        /* 💡 대시보드 콘텐츠를 '바둑판 배열(Grid)'로 변경 */
-        #dashboard-content { 
-            display: grid; 
-            /* 화면 크기에 맞춰 카드 넓이를 최소 300px로 유지하며 빈 공간을 자동으로 채움 */
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
-            gap: 20px; 
-        }
+        #dashboard-content { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
 
-        /* 리스트 카드 스타일 */
         .report-card { background: #f4f6f9; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; }
         .report-header { display: flex; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #e1e4e8; padding-bottom: 12px; flex-wrap: wrap; gap: 8px; }
         .location-badge { background: #333; color: white; padding: 4px 10px; border-radius: 20px; font-size: 13px; font-weight: bold; }
         .date-text { color: #888; font-size: 12px; }
         
-        /* 상태 뱃지 */
-        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 13px; font-weight: bold; color: white; margin-left: auto; }
+        /* 💡 상태 뱃지에 마우스를 올리면 클릭 가능함을 표시합니다 */
+        .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; color: white; margin-left: auto; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .status-badge:hover { opacity: 0.8; transform: scale(1.05); }
         .status-접수 { background: #ff4b4b; }
         .status-처리중 { background: #ff9800; }
         .status-완료 { background: #4caf50; }
@@ -58,7 +45,6 @@
         .description { font-size: 16px; color: #333; line-height: 1.6; white-space: pre-wrap; flex-grow: 1; }
         .empty-msg { text-align: center; color: #888; padding: 30px; background: #f4f6f9; border-radius: 12px; grid-column: 1 / -1; }
         
-        /* 돌아가기 버튼 디자인 */
         .btn-home { display: block; width: 200px; margin: 40px auto 0 auto; text-align: center; background: #fff; color: #333; border: 1px solid #ddd; padding: 12px 0; border-radius: 8px; text-decoration: none; font-weight: bold; transition: 0.2s; }
         .btn-home:hover { background: #f4f6f9; }
     </style>
@@ -66,17 +52,17 @@
 <body>
     <div class="container">
         
-        <!-- 🔒 로그인 화면 -->
+        <!-- 로그인 화면 -->
         <div id="login-screen">
             <img src="logo.jpg" alt="로고" class="logo-img" onerror="this.style.display='none'">
-            <h2>🔒 관리자 대시보드</h2>
-            <p style="color:#666; font-size:14px; margin-bottom:20px;">비밀번호를 입력해주세요.</p>
+            <h2>🔒 대시보드 접속</h2>
+            <p style="color:#666; font-size:14px; margin-bottom:20px;">열람용 비밀번호를 입력해주세요.</p>
             <input type="password" id="pw-input" placeholder="비밀번호" onkeypress="if(event.keyCode==13) checkPassword()">
             <br>
             <button onclick="checkPassword()" id="login-btn">접속하기</button>
         </div>
 
-        <!-- 📊 대시보드 화면 -->
+        <!-- 대시보드 화면 -->
         <div id="dashboard-main">
             <div class="header-section">
                 <img src="logo.jpg" alt="로고" class="logo-img" onerror="this.style.display='none'">
@@ -98,18 +84,16 @@
     </div>
 
     <script>
-        // 🔴 반드시 사용 중이신 웹앱 URL로 변경해 주세요!
-        const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxev7No0cR4LT2zangeNY79zQpi4OP3f-9ujmxWGSbq5VlO3vZCSaCJWjlpeufjMyKT/exec";
+        // 🔴 웹앱 URL을 입력해 주세요!
+        const WEBAPP_URL = "여기에_웹앱_URL을_넣으세요";
         let autoRefreshTimer = null;
 
         document.addEventListener("DOMContentLoaded", function() {
             const savedPw = localStorage.getItem('dashboard_pw');
             if (savedPw) {
                 document.getElementById('pw-input').value = savedPw;
-                
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('dashboard-main').style.display = 'block';
-                
                 checkPassword(true);
             }
         });
@@ -118,18 +102,8 @@
             let pw = document.getElementById('pw-input').value;
             if (!pw && isAutoLogin) pw = localStorage.getItem('dashboard_pw');
             
-            if (!pw) { 
-                alert("비밀번호를 입력해주세요."); 
-                return; 
-            }
+            if (!pw) return;
 
-            const loginBtn = document.getElementById('login-btn');
-            if (!isAutoLogin) {
-                loginBtn.innerText = "확인 중..."; 
-                loginBtn.disabled = true;
-            }
-
-            // 💡 [핵심] 브라우저가 예전 화면을 띄우지 못하도록 URL 뒤에 현재 시간(난수)을 붙여서 강제로 최신 데이터를 가져옵니다.
             const fetchUrl = WEBAPP_URL + "?pw=" + encodeURIComponent(pw) + "&t=" + new Date().getTime();
 
             fetch(fetchUrl)
@@ -137,58 +111,43 @@
                 .then(data => {
                     if (data.error) {
                         if (!isAutoLogin) alert("❌ " + data.error);
-                        
-                        loginBtn.innerText = "접속하기"; loginBtn.disabled = false;
                         document.getElementById('pw-input').value = "";
                         localStorage.removeItem('dashboard_pw');
-                        
                         document.getElementById('dashboard-main').style.display = 'none';
                         document.getElementById('login-screen').style.display = 'block';
-                        
                         if (autoRefreshTimer) clearInterval(autoRefreshTimer);
                         return;
                     }
 
                     localStorage.setItem('dashboard_pw', pw);
-
                     document.getElementById('login-screen').style.display = 'none';
                     document.getElementById('dashboard-main').style.display = 'block';
                     
                     const contentDiv = document.getElementById('dashboard-content');
-                    
-                    // 💡 통계 변수 초기화 (데이터가 0개일 때도 모두 0으로 덮어씌우기 위함)
                     let countNew = 0, countIng = 0, countDone = 0;
                     
                     if (data.length === 0) {
                         contentDiv.innerHTML = '<div class="empty-msg">아직 접수된 신고가 없습니다. 😊</div>';
                     } else {
                         const html = data.reverse().map(item => {
-                            // 💡 [핵심] 구글 시트에 띄어쓰기가 들어갔을 경우를 대비해 모든 공백을 강제로 지우고 검사합니다.
                             const rawStatus = item.status ? item.status.toString().replace(/\s/g, "") : "접수";
-                            
-                            let displayStatus = "접수";
-                            let badgeClass = "status-접수";
+                            let displayStatus = "접수", badgeClass = "status-접수";
 
                             if (rawStatus.includes("완료")) {
-                                countDone++;
-                                displayStatus = "완료";
-                                badgeClass = "status-완료";
+                                countDone++; displayStatus = "완료"; badgeClass = "status-완료";
                             } else if (rawStatus.includes("처리중")) {
-                                countIng++;
-                                displayStatus = "처리중";
-                                badgeClass = "status-처리중";
+                                countIng++; displayStatus = "처리중"; badgeClass = "status-처리중";
                             } else {
-                                countNew++;
-                                displayStatus = "접수";
-                                badgeClass = "status-접수";
+                                countNew++; displayStatus = "접수"; badgeClass = "status-접수";
                             }
 
+                            // 💡 배지를 클릭하면 상태 변경 함수(updateStatus)가 실행되도록 세팅
                             return `
                             <div class="report-card">
                                 <div class="report-header">
                                     <span class="location-badge">📍 ${item.location}</span>
                                     <span class="date-text">${item.date}</span>
-                                    <span class="status-badge ${badgeClass}">${displayStatus}</span>
+                                    <span class="status-badge ${badgeClass}" onclick="updateStatus(${item.row}, '${displayStatus}')" title="상태 변경 (클릭)">${displayStatus} 🔄</span>
                                 </div>
                                 <div class="description">${item.description}</div>
                             </div>
@@ -198,23 +157,61 @@
                         contentDiv.innerHTML = html;
                     }
 
-                    // 💡 [핵심] 계산된 최종 숫자를 HTML 통계판에 덮어씌웁니다.
                     document.getElementById('count-new').innerText = countNew;
                     document.getElementById('count-ing').innerText = countIng;
                     document.getElementById('count-done').innerText = countDone;
 
                     if (!autoRefreshTimer) {
-                        autoRefreshTimer = setInterval(() => {
-                            checkPassword(true);
-                        }, 60000); 
-                    }
-                })
-                .catch(error => {
-                    if (!isAutoLogin) {
-                        alert("⚠️ 데이터를 불러오는 중 오류가 발생했습니다.");
-                        loginBtn.innerText = "접속하기"; loginBtn.disabled = false;
+                        autoRefreshTimer = setInterval(() => { checkPassword(true); }, 10000); 
                     }
                 });
+        }
+
+        // 💡 [핵심] 상태 변경 버튼 클릭 시 실행되는 함수
+        function updateStatus(rowId, currentStatus) {
+            // 1. 상태 변경 전용 비밀번호가 저장되어 있는지 확인
+            let editPw = localStorage.getItem('dashboard_edit_pw');
+            
+            if (!editPw) {
+                editPw = prompt("상태 변경을 위한 '관리자 비밀번호'를 입력하세요:");
+                if (!editPw) return; // 취소 누르면 종료
+            }
+
+            // 2. 바꿀 상태 입력받기 (오타 방지를 위해 예시 제공)
+            let newStatus = prompt(`현재 상태: [${currentStatus}]\n\n변경할 상태를 정확히 입력하세요.\n(접수, 처리중, 완료 중 택 1)`, currentStatus);
+            if (!newStatus) return; // 취소 누르면 종료
+            
+            newStatus = newStatus.replace(/\s/g, ""); // 공백 제거
+            if (newStatus !== "접수" && newStatus !== "처리중" && newStatus !== "완료") {
+                alert("⚠️ '접수', '처리중', '완료' 중 하나만 입력해주세요.");
+                return;
+            }
+
+            if (newStatus === currentStatus) return; // 상태가 그대로면 서버에 안 보냄
+
+            // 3. 서버(앱스 스크립트)로 변경 데이터 전송
+            fetch(WEBAPP_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: "update_status",
+                    row: rowId,
+                    status: newStatus,
+                    edit_pw: editPw
+                })
+            })
+            .then(res => res.json())
+            .then(resData => {
+                if (resData.status === "error") {
+                    alert("❌ " + resData.message);
+                    localStorage.removeItem('dashboard_edit_pw'); // 비밀번호 틀리면 기억 삭제
+                } else {
+                    localStorage.setItem('dashboard_edit_pw', editPw); // 성공 시 비밀번호 기억
+                    checkPassword(true); // 성공 즉시 화면 새로고침하여 반영
+                }
+            })
+            .catch(err => {
+                alert("⚠️ 통신 오류가 발생했습니다.");
+            });
         }
     </script>
 </body>
