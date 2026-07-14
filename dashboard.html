@@ -16,7 +16,6 @@
         
         #login-screen { text-align: center; background: #ffffff; padding: 40px 20px; border-radius: 12px; border: 1px solid #eee; margin-top: 10vh; max-width: 400px; margin-left: auto; margin-right: auto; }
         #login-screen input { padding: 12px; font-size: 16px; background: #f4f6f9; border: 1px solid #e1e4e8; border-radius: 8px; width: 250px; text-align: center; margin-bottom: 15px; outline: none; }
-        #login-screen input:focus { border-color: #333; }
         #login-screen button { padding: 12px 30px; font-size: 16px; background: #333; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 276px; }
         
         #dashboard-main { display: none; }
@@ -42,21 +41,21 @@
         .status-완료 { background: #4caf50; }
 
         .description { font-size: 16px; color: #333; line-height: 1.6; white-space: pre-wrap; flex-grow: 1; }
-        .empty-msg { text-align: center; color: #888; padding: 30px; background: #f4f6f9; border-radius: 12px; grid-column: 1 / -1; }
         
+        /* 💡 조치내역 표시 디자인 */
+        .action-result { background: #e8f5e9; border-left: 4px solid #4caf50; padding: 12px; margin-top: 15px; border-radius: 4px; font-size: 14px; color: #2e7d32; line-height: 1.5; white-space: pre-wrap; }
+        
+        .empty-msg { text-align: center; color: #888; padding: 30px; background: #f4f6f9; border-radius: 12px; grid-column: 1 / -1; }
         .btn-home { display: block; width: 200px; margin: 40px auto 0 auto; text-align: center; background: #fff; color: #333; border: 1px solid #ddd; padding: 12px 0; border-radius: 8px; text-decoration: none; font-weight: bold; transition: 0.2s; }
-        .btn-home:hover { background: #f4f6f9; }
-
-        /* 💡 커스텀 모달 팝업 디자인 */
+        
+        /* 모달 디자인 */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; justify-content: center; align-items: center; backdrop-filter: blur(3px); }
         .modal-box { background: white; padding: 30px 25px; border-radius: 16px; width: 280px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
         .modal-box h3 { margin-top: 0; color: #333; font-size: 20px; margin-bottom: 20px; }
         
-        /* 비밀번호 입력 섹션 */
         #modal-pw-section input { width: 90%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; outline: none; text-align: center; font-size: 16px; }
         #modal-pw-section button { background: #333; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; font-size: 16px; }
         
-        /* 버튼 선택 섹션 */
         .modal-buttons { display: flex; flex-direction: column; gap: 10px; }
         .m-btn { border: none; padding: 14px; border-radius: 8px; font-weight: bold; color: white; cursor: pointer; font-size: 16px; transition: 0.2s; }
         .m-btn:hover { transform: scale(1.02); filter: brightness(1.1); }
@@ -64,13 +63,15 @@
         .m-처리중 { background: #ff9800; }
         .m-완료 { background: #4caf50; }
         
+        /* 💡 조치내역 입력창 디자인 */
+        #modal-action-section textarea { width: 90%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; outline: none; font-size: 14px; resize: none; font-family: 'Pretendard', sans-serif; }
+        #modal-action-section button { width: 100%; }
+
         .btn-modal-close { margin-top: 20px; background: transparent; border: none; color: #888; font-size: 14px; cursor: pointer; padding: 5px; }
-        .btn-modal-close:hover { color: #333; text-decoration: underline; }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- 로그인 화면 -->
         <div id="login-screen">
             <img src="logo.jpg" alt="로고" class="logo-img" onerror="this.style.display='none'">
             <h2>🔒 대시보드 접속</h2>
@@ -80,7 +81,6 @@
             <button onclick="checkPassword()" id="login-btn">접속하기</button>
         </div>
 
-        <!-- 대시보드 화면 -->
         <div id="dashboard-main">
             <div class="header-section">
                 <img src="logo.jpg" alt="로고" class="logo-img" onerror="this.style.display='none'">
@@ -101,7 +101,7 @@
         </div>
     </div>
 
-    <!-- 💡 새로운 커스텀 상태 변경 팝업창 -->
+    <!-- 커스텀 팝업창 -->
     <div id="custom-modal" class="modal-overlay">
         <div class="modal-box">
             <h3 id="modal-title">⚙️ 상태 변경</h3>
@@ -116,8 +116,16 @@
                 <div class="modal-buttons">
                     <button class="m-btn m-접수" onclick="sendUpdate('접수')">접수</button>
                     <button class="m-btn m-처리중" onclick="sendUpdate('처리중')">처리중</button>
-                    <button class="m-btn m-완료" onclick="sendUpdate('완료')">완료</button>
+                    <!-- 💡 완료 버튼을 누르면 입력창 표시 함수 호출 -->
+                    <button class="m-btn m-완료" onclick="showActionInput()">완료 (조치내역 입력)</button>
                 </div>
+            </div>
+
+            <!-- 💡 조치내역 입력창 섹션 -->
+            <div id="modal-action-section" style="display:none;">
+                <p style="font-size:14px; color:#666; margin-bottom:10px;">어떻게 조치하셨나요?</p>
+                <textarea id="action-text-input" rows="3" placeholder="예: 파손된 안전펜스 교체 완료"></textarea>
+                <button class="m-btn m-완료" onclick="submitComplete()">최종 등록</button>
             </div>
 
             <button class="btn-modal-close" onclick="closeModal()">취소 및 닫기</button>
@@ -128,7 +136,7 @@
         // 🔴 웹앱 URL을 입력해 주세요!
         const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxev7No0cR4LT2zangeNY79zQpi4OP3f-9ujmxWGSbq5VlO3vZCSaCJWjlpeufjMyKT/exec";
         let autoRefreshTimer = null;
-        let targetRow = null; // 상태를 변경할 시트의 행 번호 기억
+        let targetRow = null; 
 
         document.addEventListener("DOMContentLoaded", function() {
             const savedPw = localStorage.getItem('dashboard_pw');
@@ -182,7 +190,12 @@
                                 countNew++; displayStatus = "접수"; badgeClass = "status-접수";
                             }
 
-                            // 버튼을 누르면 openModal 함수 실행
+                            // 💡 조치내역이 있으면 초록색 박스(action-result) 추가
+                            let actionHtml = '';
+                            if (displayStatus === "완료" && item.action_taken) {
+                                actionHtml = `<div class="action-result"><strong>✅ 조치내역:</strong><br>${item.action_taken}</div>`;
+                            }
+
                             return `
                             <div class="report-card">
                                 <div class="report-header">
@@ -191,6 +204,7 @@
                                     <span class="status-badge ${badgeClass}" onclick="openModal(${item.row})" title="상태 변경 (클릭)">${displayStatus} 🔄</span>
                                 </div>
                                 <div class="description">${item.description}</div>
+                                ${actionHtml}
                             </div>
                             `;
                         }).join('');
@@ -208,20 +222,19 @@
                 });
         }
 
-        // 💡 [새로운 로직] 커스텀 팝업창 열기
         function openModal(rowId) {
             targetRow = rowId;
             document.getElementById('custom-modal').style.display = 'flex';
             
             let editPw = localStorage.getItem('dashboard_edit_pw');
             if (!editPw) {
-                // 관리자 비밀번호가 없으면 입력창 표시
                 document.getElementById('modal-pw-section').style.display = 'block';
                 document.getElementById('modal-btn-section').style.display = 'none';
+                document.getElementById('modal-action-section').style.display = 'none';
                 document.getElementById('edit-pw-input').focus();
             } else {
-                // 이미 인증되었다면 바로 버튼 3개 표시
                 document.getElementById('modal-pw-section').style.display = 'none';
+                document.getElementById('modal-action-section').style.display = 'none';
                 document.getElementById('modal-btn-section').style.display = 'block';
             }
         }
@@ -229,21 +242,36 @@
         function savePwAndShowButtons() {
             const pw = document.getElementById('edit-pw-input').value;
             if(!pw) { alert("비밀번호를 입력해주세요."); return; }
-            
-            // 임시로 저장하고 버튼 화면으로 전환
             localStorage.setItem('dashboard_edit_pw', pw);
             document.getElementById('modal-pw-section').style.display = 'none';
             document.getElementById('modal-btn-section').style.display = 'block';
         }
 
-        // 상태를 서버로 전송
-        function sendUpdate(newStatus) {
+        // 💡 [완료] 버튼 클릭 시 입력창 보여주기
+        function showActionInput() {
+            document.getElementById('modal-btn-section').style.display = 'none';
+            document.getElementById('modal-action-section').style.display = 'block';
+            document.getElementById('action-text-input').focus();
+        }
+
+        // 💡 최종 완료 등록
+        function submitComplete() {
+            const actionText = document.getElementById('action-text-input').value.trim();
+            if(!actionText) { 
+                alert("조치 내역을 입력해주세요!"); 
+                document.getElementById('action-text-input').focus();
+                return; 
+            }
+            sendUpdate('완료', actionText);
+        }
+
+        function sendUpdate(newStatus, actionText = "") {
             let editPw = localStorage.getItem('dashboard_edit_pw');
             if(!editPw) return;
 
-            // 로딩 처리
             document.getElementById('modal-title').innerText = "업데이트 중... ⏳";
             document.getElementById('modal-btn-section').style.display = 'none';
+            document.getElementById('modal-action-section').style.display = 'none';
 
             fetch(WEBAPP_URL, {
                 method: 'POST',
@@ -251,18 +279,19 @@
                     action: "update_status",
                     row: targetRow,
                     status: newStatus,
-                    edit_pw: editPw
+                    edit_pw: editPw,
+                    action_taken: actionText // 💡 조치내역 데이터 함께 전송
                 })
             })
             .then(res => res.json())
             .then(resData => {
                 if (resData.status === "error") {
                     alert("❌ " + resData.message);
-                    localStorage.removeItem('dashboard_edit_pw'); // 틀리면 기억 삭제
+                    localStorage.removeItem('dashboard_edit_pw'); 
                     closeModal();
                 } else {
                     closeModal();
-                    checkPassword(true); // 성공 즉시 대시보드 갱신
+                    checkPassword(true); 
                 }
             })
             .catch(err => {
@@ -271,11 +300,11 @@
             });
         }
 
-        // 팝업창 닫기 초기화
         function closeModal() {
             document.getElementById('custom-modal').style.display = 'none';
             document.getElementById('modal-title').innerText = "⚙️ 상태 변경";
             document.getElementById('edit-pw-input').value = "";
+            document.getElementById('action-text-input').value = ""; // 입력창 초기화
         }
     </script>
 </body>
