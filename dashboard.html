@@ -59,7 +59,18 @@
         .status-처리중 { background: #ff9800; }
         .status-완료 { background: #4caf50; }
 
-        .description { font-size: 16px; color: #333; line-height: 1.6; white-space: pre-wrap; flex-grow: 1; }
+        /* 💡 높이를 고정하고 넘치면 스크롤 생성 */
+        .description { 
+            font-size: 16px; color: #333; line-height: 1.6; white-space: pre-wrap; flex-grow: 1;
+            max-height: 120px; /* 카드의 최대 텍스트 높이 (원하는 대로 조절 가능) */
+            overflow-y: auto;  /* 내용이 넘치면 세로 스크롤바 자동 생성 */
+            padding-right: 5px; 
+        }
+        
+        /* 💡 스크롤바를 얇고 예쁘게 꾸미는 옵션 */
+        .description::-webkit-scrollbar { width: 6px; }
+        .description::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+        .description::-webkit-scrollbar-track { background: transparent; }
         
         .plan-result { background: #fff3e0; border-left: 4px solid #ff9800; padding: 12px; margin-top: 15px; border-radius: 4px; font-size: 14px; color: #e65100; line-height: 1.5; white-space: pre-wrap; }
         .action-result { background: #e8f5e9; border-left: 4px solid #4caf50; padding: 12px; margin-top: 15px; border-radius: 4px; font-size: 14px; color: #2e7d32; line-height: 1.5; white-space: pre-wrap; }
