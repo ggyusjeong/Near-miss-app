@@ -42,13 +42,15 @@
 
         .description { font-size: 16px; color: #333; line-height: 1.6; white-space: pre-wrap; flex-grow: 1; }
         
-        /* 💡 조치내역 표시 디자인 */
+        /* 💡 추가된 [처리 계획] 박스 스타일 (주황색) */
+        .plan-result { background: #fff3e0; border-left: 4px solid #ff9800; padding: 12px; margin-top: 15px; border-radius: 4px; font-size: 14px; color: #e65100; line-height: 1.5; white-space: pre-wrap; }
+        
+        /* 기존 [조치 내역] 박스 스타일 (초록색) */
         .action-result { background: #e8f5e9; border-left: 4px solid #4caf50; padding: 12px; margin-top: 15px; border-radius: 4px; font-size: 14px; color: #2e7d32; line-height: 1.5; white-space: pre-wrap; }
         
         .empty-msg { text-align: center; color: #888; padding: 30px; background: #f4f6f9; border-radius: 12px; grid-column: 1 / -1; }
         .btn-home { display: block; width: 200px; margin: 40px auto 0 auto; text-align: center; background: #fff; color: #333; border: 1px solid #ddd; padding: 12px 0; border-radius: 8px; text-decoration: none; font-weight: bold; transition: 0.2s; }
         
-        /* 모달 디자인 */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; justify-content: center; align-items: center; backdrop-filter: blur(3px); }
         .modal-box { background: white; padding: 30px 25px; border-radius: 16px; width: 280px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
         .modal-box h3 { margin-top: 0; color: #333; font-size: 20px; margin-bottom: 20px; }
@@ -63,9 +65,8 @@
         .m-처리중 { background: #ff9800; }
         .m-완료 { background: #4caf50; }
         
-        /* 💡 조치내역 입력창 디자인 */
-        #modal-action-section textarea { width: 90%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; outline: none; font-size: 14px; resize: none; font-family: 'Pretendard', sans-serif; }
-        #modal-action-section button { width: 100%; }
+        #modal-text-section textarea { width: 90%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; outline: none; font-size: 14px; resize: none; font-family: 'Pretendard', sans-serif; }
+        #modal-text-section button { width: 100%; }
 
         .btn-modal-close { margin-top: 20px; background: transparent; border: none; color: #888; font-size: 14px; cursor: pointer; padding: 5px; }
     </style>
@@ -101,7 +102,6 @@
         </div>
     </div>
 
-    <!-- 커스텀 팝업창 -->
     <div id="custom-modal" class="modal-overlay">
         <div class="modal-box">
             <h3 id="modal-title">⚙️ 상태 변경</h3>
@@ -115,17 +115,17 @@
             <div id="modal-btn-section" style="display:none;">
                 <div class="modal-buttons">
                     <button class="m-btn m-접수" onclick="sendUpdate('접수')">접수</button>
-                    <button class="m-btn m-처리중" onclick="sendUpdate('처리중')">처리중</button>
-                    <!-- 💡 완료 버튼을 누르면 입력창 표시 함수 호출 -->
-                    <button class="m-btn m-완료" onclick="showActionInput()">완료 (조치내역 입력)</button>
+                    <!-- 💡 처리중/완료 모두 텍스트를 입력하도록 함수 변경 -->
+                    <button class="m-btn m-처리중" onclick="showTextInput('처리중')">처리중 (계획 입력)</button>
+                    <button class="m-btn m-완료" onclick="showTextInput('완료')">완료 (조치내역 입력)</button>
                 </div>
             </div>
 
-            <!-- 💡 조치내역 입력창 섹션 -->
-            <div id="modal-action-section" style="display:none;">
-                <p style="font-size:14px; color:#666; margin-bottom:10px;">어떻게 조치하셨나요?</p>
-                <textarea id="action-text-input" rows="3" placeholder="예: 파손된 안전펜스 교체 완료"></textarea>
-                <button class="m-btn m-완료" onclick="submitComplete()">최종 등록</button>
+            <!-- 💡 공용 텍스트 입력창 -->
+            <div id="modal-text-section" style="display:none;">
+                <p id="modal-text-desc" style="font-size:14px; color:#666; margin-bottom:10px;">어떻게 조치하실 계획인가요?</p>
+                <textarea id="modal-textarea" rows="3"></textarea>
+                <button id="modal-submit-btn" class="m-btn" onclick="submitStatus()">최종 등록</button>
             </div>
 
             <button class="btn-modal-close" onclick="closeModal()">취소 및 닫기</button>
@@ -137,6 +137,7 @@
         const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxev7No0cR4LT2zangeNY79zQpi4OP3f-9ujmxWGSbq5VlO3vZCSaCJWjlpeufjMyKT/exec";
         let autoRefreshTimer = null;
         let targetRow = null; 
+        let pendingStatus = ""; // 사용자가 누른 버튼(처리중 or 완료)을 기억하는 변수
 
         document.addEventListener("DOMContentLoaded", function() {
             const savedPw = localStorage.getItem('dashboard_pw');
@@ -190,10 +191,12 @@
                                 countNew++; displayStatus = "접수"; badgeClass = "status-접수";
                             }
 
-                            // 💡 조치내역이 있으면 초록색 박스(action-result) 추가
+                            // 💡 조건별 박스 출력 로직 (우선순위: 조치내역 > 처리계획)
                             let actionHtml = '';
                             if (displayStatus === "완료" && item.action_taken) {
-                                actionHtml = `<div class="action-result"><strong>✅ 조치내역:</strong><br>${item.action_taken}</div>`;
+                                actionHtml = `<div class="action-result"><strong>✅ 조치 내역:</strong><br>${item.action_taken}</div>`;
+                            } else if (displayStatus === "처리중" && item.treatment_plan) {
+                                actionHtml = `<div class="plan-result"><strong>🚧 처리 계획:</strong><br>${item.treatment_plan}</div>`;
                             }
 
                             return `
@@ -230,11 +233,11 @@
             if (!editPw) {
                 document.getElementById('modal-pw-section').style.display = 'block';
                 document.getElementById('modal-btn-section').style.display = 'none';
-                document.getElementById('modal-action-section').style.display = 'none';
+                document.getElementById('modal-text-section').style.display = 'none';
                 document.getElementById('edit-pw-input').focus();
             } else {
                 document.getElementById('modal-pw-section').style.display = 'none';
-                document.getElementById('modal-action-section').style.display = 'none';
+                document.getElementById('modal-text-section').style.display = 'none';
                 document.getElementById('modal-btn-section').style.display = 'block';
             }
         }
@@ -247,31 +250,55 @@
             document.getElementById('modal-btn-section').style.display = 'block';
         }
 
-        // 💡 [완료] 버튼 클릭 시 입력창 보여주기
-        function showActionInput() {
+        // 💡 버튼에 따라 입력창의 안내문과 색상을 바꾸는 로직
+        function showTextInput(statusType) {
+            pendingStatus = statusType; // 사용자가 뭘 눌렀는지 기억
+            
             document.getElementById('modal-btn-section').style.display = 'none';
-            document.getElementById('modal-action-section').style.display = 'block';
-            document.getElementById('action-text-input').focus();
+            document.getElementById('modal-text-section').style.display = 'block';
+            
+            const desc = document.getElementById('modal-text-desc');
+            const textarea = document.getElementById('modal-textarea');
+            const submitBtn = document.getElementById('modal-submit-btn');
+
+            if (statusType === '처리중') {
+                desc.innerText = "어떤 조치를 취할 계획인가요?";
+                textarea.placeholder = "예: 보완 자재 수급 후 조치 예정";
+                submitBtn.className = "m-btn m-처리중";
+            } else if (statusType === '완료') {
+                desc.innerText = "어떻게 조치하셨나요?";
+                textarea.placeholder = "예: 시설 보수 통한 조치 완료";
+                submitBtn.className = "m-btn m-완료";
+            }
+            
+            textarea.value = "";
+            textarea.focus();
         }
 
-        // 💡 최종 완료 등록
-        function submitComplete() {
-            const actionText = document.getElementById('action-text-input').value.trim();
-            if(!actionText) { 
-                alert("조치 내역을 입력해주세요!"); 
-                document.getElementById('action-text-input').focus();
+        function submitStatus() {
+            const textVal = document.getElementById('modal-textarea').value.trim();
+            if(!textVal) { 
+                alert("내용을 입력해주세요!"); 
+                document.getElementById('modal-textarea').focus();
                 return; 
             }
-            sendUpdate('완료', actionText);
+            
+            // 처리중이면 계획으로, 완료면 조치내역으로 전송
+            if (pendingStatus === '처리중') {
+                sendUpdate('처리중', '', textVal);
+            } else if (pendingStatus === '완료') {
+                sendUpdate('완료', textVal, '');
+            }
         }
 
-        function sendUpdate(newStatus, actionText = "") {
+        // 서버로 전송하는 함수
+        function sendUpdate(newStatus, actionText = "", planText = "") {
             let editPw = localStorage.getItem('dashboard_edit_pw');
             if(!editPw) return;
 
             document.getElementById('modal-title').innerText = "업데이트 중... ⏳";
             document.getElementById('modal-btn-section').style.display = 'none';
-            document.getElementById('modal-action-section').style.display = 'none';
+            document.getElementById('modal-text-section').style.display = 'none';
 
             fetch(WEBAPP_URL, {
                 method: 'POST',
@@ -280,7 +307,8 @@
                     row: targetRow,
                     status: newStatus,
                     edit_pw: editPw,
-                    action_taken: actionText // 💡 조치내역 데이터 함께 전송
+                    action_taken: actionText,      // 조치내역
+                    treatment_plan: planText       // 처리계획
                 })
             })
             .then(res => res.json())
@@ -304,7 +332,7 @@
             document.getElementById('custom-modal').style.display = 'none';
             document.getElementById('modal-title').innerText = "⚙️ 상태 변경";
             document.getElementById('edit-pw-input').value = "";
-            document.getElementById('action-text-input').value = ""; // 입력창 초기화
+            document.getElementById('modal-textarea').value = "";
         }
     </script>
 </body>
