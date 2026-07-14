@@ -19,13 +19,30 @@
         #login-screen button { padding: 12px 30px; font-size: 16px; background: #333; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 276px; }
         
         #dashboard-main { display: none; }
-        .summary-box { display: flex; justify-content: space-around; background: #f4f6f9; padding: 20px 10px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .summary-item { text-align: center; font-size: 16px; color: #666; font-weight: 600; width: 33%; border-right: 1px solid #e1e4e8; }
+        
+        .filter-section { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; }
+        .filter-section h2 { margin: 0; font-size: 18px; color: #333; }
+        .filter-select { padding: 10px 15px; font-size: 15px; border-radius: 8px; border: 1px solid #ddd; background-color: #fff; font-family: 'Pretendard', sans-serif; cursor: pointer; outline: none; font-weight: bold; color: #333; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .filter-select:hover { border-color: #999; }
+
+        /* 💡 통계판(전체/월별)을 나란히 배치하기 위한 그리드 레이아웃 */
+        .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+        
+        .summary-box { background: #f4f6f9; padding: 20px 10px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .summary-title { text-align: center; font-size: 15px; font-weight: bold; color: #333; margin-bottom: 15px; background: #e1e4e8; padding: 5px; border-radius: 6px; width: fit-content; margin-left: auto; margin-right: auto; }
+        .summary-items-wrap { display: flex; justify-content: space-around; }
+        
+        .summary-item { text-align: center; font-size: 15px; color: #666; font-weight: 600; width: 33%; border-right: 1px solid #e1e4e8; }
         .summary-item:last-child { border-right: none; }
-        .summary-num { display: block; font-size: 32px; font-weight: 800; margin-top: 8px; }
+        .summary-num { display: block; font-size: 28px; font-weight: 800; margin-top: 8px; }
         .num-new { color: #ff4b4b; }
         .num-ing { color: #ff9800; }
         .num-done { color: #4caf50; }
+
+        /* 모바일 등 좁은 화면에서는 위아래로 떨어지게 만듦 */
+        @media (max-width: 768px) {
+            .summary-grid { grid-template-columns: 1fr; gap: 15px; }
+        }
 
         #dashboard-content { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
 
@@ -42,13 +59,10 @@
 
         .description { font-size: 16px; color: #333; line-height: 1.6; white-space: pre-wrap; flex-grow: 1; }
         
-        /* 💡 추가된 [처리 계획] 박스 스타일 (주황색) */
         .plan-result { background: #fff3e0; border-left: 4px solid #ff9800; padding: 12px; margin-top: 15px; border-radius: 4px; font-size: 14px; color: #e65100; line-height: 1.5; white-space: pre-wrap; }
-        
-        /* 기존 [조치 내역] 박스 스타일 (초록색) */
         .action-result { background: #e8f5e9; border-left: 4px solid #4caf50; padding: 12px; margin-top: 15px; border-radius: 4px; font-size: 14px; color: #2e7d32; line-height: 1.5; white-space: pre-wrap; }
         
-        .empty-msg { text-align: center; color: #888; padding: 30px; background: #f4f6f9; border-radius: 12px; grid-column: 1 / -1; }
+        .empty-msg { text-align: center; color: #888; padding: 30px; background: #f4f6f9; border-radius: 12px; grid-column: 1 / -1; font-size: 16px; }
         .btn-home { display: block; width: 200px; margin: 40px auto 0 auto; text-align: center; background: #fff; color: #333; border: 1px solid #ddd; padding: 12px 0; border-radius: 8px; text-decoration: none; font-weight: bold; transition: 0.2s; }
         
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; justify-content: center; align-items: center; backdrop-filter: blur(3px); }
@@ -87,13 +101,39 @@
                 <img src="logo.jpg" alt="로고" class="logo-img" onerror="this.style.display='none'">
                 <h1>실시간 아차사고 신고 현황판</h1>
             </div>
-
-            <div class="summary-box">
-                <div class="summary-item">접수<span class="summary-num num-new" id="count-new">0</span></div>
-                <div class="summary-item">처리중<span class="summary-num num-ing" id="count-ing">0</span></div>
-                <div class="summary-item">완료<span class="summary-num num-done" id="count-done">0</span></div>
+            
+            <div class="filter-section">
+                <h2>📊 요약 현황</h2>
+                <!-- 월별 선택 드롭다운 -->
+                <select id="month-filter" class="filter-select" onchange="applyFilter()">
+                    <option value="all">전체 기간 보기</option>
+                </select>
             </div>
 
+            <!-- 💡 전체 현황과 월별 현황을 나란히 보여주는 두 개의 박스 -->
+            <div class="summary-grid">
+                <!-- 1. 전체 누적 현황 박스 -->
+                <div class="summary-box">
+                    <div class="summary-title">📈 전체 누적 현황</div>
+                    <div class="summary-items-wrap">
+                        <div class="summary-item">총 접수<span class="summary-num num-new" id="total-count-new">0</span></div>
+                        <div class="summary-item">총 처리중<span class="summary-num num-ing" id="total-count-ing">0</span></div>
+                        <div class="summary-item">총 완료<span class="summary-num num-done" id="total-count-done">0</span></div>
+                    </div>
+                </div>
+
+                <!-- 2. 선택 기간 현황 박스 -->
+                <div class="summary-box">
+                    <div class="summary-title" id="filter-box-title">🗓️ 선택 기간 현황</div>
+                    <div class="summary-items-wrap">
+                        <div class="summary-item">접수<span class="summary-num num-new" id="count-new">0</span></div>
+                        <div class="summary-item">처리중<span class="summary-num num-ing" id="count-ing">0</span></div>
+                        <div class="summary-item">완료<span class="summary-num num-done" id="count-done">0</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 하단 데이터 카드 표시 영역 -->
             <div id="dashboard-content">
                 <div style="text-align: center; color: #666; padding: 20px; font-weight: bold;">데이터를 불러오는 중입니다... ⏳</div>
             </div>
@@ -102,6 +142,7 @@
         </div>
     </div>
 
+    <!-- 커스텀 팝업창 -->
     <div id="custom-modal" class="modal-overlay">
         <div class="modal-box">
             <h3 id="modal-title">⚙️ 상태 변경</h3>
@@ -115,13 +156,11 @@
             <div id="modal-btn-section" style="display:none;">
                 <div class="modal-buttons">
                     <button class="m-btn m-접수" onclick="sendUpdate('접수')">접수</button>
-                    <!-- 💡 처리중/완료 모두 텍스트를 입력하도록 함수 변경 -->
                     <button class="m-btn m-처리중" onclick="showTextInput('처리중')">처리중 (계획 입력)</button>
                     <button class="m-btn m-완료" onclick="showTextInput('완료')">완료 (조치내역 입력)</button>
                 </div>
             </div>
 
-            <!-- 💡 공용 텍스트 입력창 -->
             <div id="modal-text-section" style="display:none;">
                 <p id="modal-text-desc" style="font-size:14px; color:#666; margin-bottom:10px;">어떻게 조치하실 계획인가요?</p>
                 <textarea id="modal-textarea" rows="3"></textarea>
@@ -135,9 +174,13 @@
     <script>
         // 🔴 웹앱 URL을 입력해 주세요!
         const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxev7No0cR4LT2zangeNY79zQpi4OP3f-9ujmxWGSbq5VlO3vZCSaCJWjlpeufjMyKT/exec";
+        
         let autoRefreshTimer = null;
         let targetRow = null; 
-        let pendingStatus = ""; // 사용자가 누른 버튼(처리중 or 완료)을 기억하는 변수
+        let pendingStatus = ""; 
+        
+        let allReportsData = []; 
+        let currentFilter = "all";
 
         document.addEventListener("DOMContentLoaded", function() {
             const savedPw = localStorage.getItem('dashboard_pw');
@@ -173,51 +216,9 @@
                     document.getElementById('login-screen').style.display = 'none';
                     document.getElementById('dashboard-main').style.display = 'block';
                     
-                    const contentDiv = document.getElementById('dashboard-content');
-                    let countNew = 0, countIng = 0, countDone = 0;
-                    
-                    if (data.length === 0) {
-                        contentDiv.innerHTML = '<div class="empty-msg">아직 접수된 신고가 없습니다. 😊</div>';
-                    } else {
-                        const html = data.reverse().map(item => {
-                            const rawStatus = item.status ? item.status.toString().replace(/\s/g, "") : "접수";
-                            let displayStatus = "접수", badgeClass = "status-접수";
-
-                            if (rawStatus.includes("완료")) {
-                                countDone++; displayStatus = "완료"; badgeClass = "status-완료";
-                            } else if (rawStatus.includes("처리중")) {
-                                countIng++; displayStatus = "처리중"; badgeClass = "status-처리중";
-                            } else {
-                                countNew++; displayStatus = "접수"; badgeClass = "status-접수";
-                            }
-
-                            // 💡 조건별 박스 출력 로직 (우선순위: 조치내역 > 처리계획)
-                            let actionHtml = '';
-                            if (displayStatus === "완료" && item.action_taken) {
-                                actionHtml = `<div class="action-result"><strong>✅ 조치 내역:</strong><br>${item.action_taken}</div>`;
-                            } else if (displayStatus === "처리중" && item.treatment_plan) {
-                                actionHtml = `<div class="plan-result"><strong>🚧 처리 계획:</strong><br>${item.treatment_plan}</div>`;
-                            }
-
-                            return `
-                            <div class="report-card">
-                                <div class="report-header">
-                                    <span class="location-badge">📍 ${item.location}</span>
-                                    <span class="date-text">${item.date}</span>
-                                    <span class="status-badge ${badgeClass}" onclick="openModal(${item.row})" title="상태 변경 (클릭)">${displayStatus} 🔄</span>
-                                </div>
-                                <div class="description">${item.description}</div>
-                                ${actionHtml}
-                            </div>
-                            `;
-                        }).join('');
-
-                        contentDiv.innerHTML = html;
-                    }
-
-                    document.getElementById('count-new').innerText = countNew;
-                    document.getElementById('count-ing').innerText = countIng;
-                    document.getElementById('count-done').innerText = countDone;
+                    allReportsData = data.reverse(); 
+                    updateFilterDropdown();
+                    renderDashboard();
 
                     if (!autoRefreshTimer) {
                         autoRefreshTimer = setInterval(() => { checkPassword(true); }, 10000); 
@@ -225,6 +226,118 @@
                 });
         }
 
+        function extractMonth(dateStr) {
+            let match = String(dateStr).match(/(\d{4})[-. /년]+(\d{1,2})/);
+            if (match) return `${match[1]}년 ${match[2].padStart(2, '0')}월`;
+            return null;
+        }
+
+        function updateFilterDropdown() {
+            const select = document.getElementById('month-filter');
+            const monthSet = new Set();
+            
+            allReportsData.forEach(item => {
+                const m = extractMonth(item.date);
+                if (m) monthSet.add(m);
+            });
+
+            let months = Array.from(monthSet).sort((a,b) => b.localeCompare(a)); 
+            let optionsHtml = '<option value="all">전체 기간 보기</option>';
+            months.forEach(m => {
+                optionsHtml += `<option value="${m}">${m}</option>`;
+            });
+            
+            select.innerHTML = optionsHtml;
+            
+            if (currentFilter === "all" || months.includes(currentFilter)) {
+                select.value = currentFilter;
+            } else {
+                currentFilter = "all";
+                select.value = "all";
+            }
+        }
+
+        function applyFilter() {
+            currentFilter = document.getElementById('month-filter').value;
+            renderDashboard(); 
+        }
+
+        function renderDashboard() {
+            const contentDiv = document.getElementById('dashboard-content');
+            
+            // 💡 1. [전체 누적 현황] 통계 계산
+            let totalNew = 0, totalIng = 0, totalDone = 0;
+            allReportsData.forEach(item => {
+                const rawStatus = item.status ? item.status.toString().replace(/\s/g, "") : "접수";
+                if (rawStatus.includes("완료")) totalDone++;
+                else if (rawStatus.includes("처리중")) totalIng++;
+                else totalNew++;
+            });
+
+            // 전체 숫자 덮어쓰기
+            document.getElementById('total-count-new').innerText = totalNew;
+            document.getElementById('total-count-ing').innerText = totalIng;
+            document.getElementById('total-count-done').innerText = totalDone;
+
+            // 💡 2. [선택 월 현황] 필터 및 통계 계산
+            let filteredData = allReportsData;
+            
+            // 필터 박스의 제목 변경 로직
+            const filterTitle = document.getElementById('filter-box-title');
+            if (currentFilter !== "all") {
+                filteredData = allReportsData.filter(item => extractMonth(item.date) === currentFilter);
+                filterTitle.innerText = `🗓️ ${currentFilter} 현황`;
+            } else {
+                filterTitle.innerText = `🗓️ 선택 기간 현황`;
+            }
+
+            let countNew = 0, countIng = 0, countDone = 0;
+            
+            if (filteredData.length === 0) {
+                contentDiv.innerHTML = '<div class="empty-msg">해당 기간에 접수된 신고가 없습니다. 😊</div>';
+            } else {
+                const html = filteredData.map(item => {
+                    const rawStatus = item.status ? item.status.toString().replace(/\s/g, "") : "접수";
+                    let displayStatus = "접수", badgeClass = "status-접수";
+
+                    if (rawStatus.includes("완료")) {
+                        countDone++; displayStatus = "완료"; badgeClass = "status-완료";
+                    } else if (rawStatus.includes("처리중")) {
+                        countIng++; displayStatus = "처리중"; badgeClass = "status-처리중";
+                    } else {
+                        countNew++; displayStatus = "접수"; badgeClass = "status-접수";
+                    }
+
+                    let actionHtml = '';
+                    if (displayStatus === "완료" && item.action_taken) {
+                        actionHtml = `<div class="action-result"><strong>✅ 조치 내역:</strong><br>${item.action_taken}</div>`;
+                    } else if (displayStatus === "처리중" && item.treatment_plan) {
+                        actionHtml = `<div class="plan-result"><strong>🚧 처리 계획:</strong><br>${item.treatment_plan}</div>`;
+                    }
+
+                    return `
+                    <div class="report-card">
+                        <div class="report-header">
+                            <span class="location-badge">📍 ${item.location}</span>
+                            <span class="date-text">${item.date}</span>
+                            <span class="status-badge ${badgeClass}" onclick="openModal(${item.row})" title="상태 변경 (클릭)">${displayStatus} 🔄</span>
+                        </div>
+                        <div class="description">${item.description}</div>
+                        ${actionHtml}
+                    </div>
+                    `;
+                }).join('');
+
+                contentDiv.innerHTML = html;
+            }
+
+            // 필터된 숫자 덮어쓰기
+            document.getElementById('count-new').innerText = countNew;
+            document.getElementById('count-ing').innerText = countIng;
+            document.getElementById('count-done').innerText = countDone;
+        }
+
+        /* 💡 아래의 모달창 팝업 로직은 그대로입니다! */
         function openModal(rowId) {
             targetRow = rowId;
             document.getElementById('custom-modal').style.display = 'flex';
@@ -250,10 +363,8 @@
             document.getElementById('modal-btn-section').style.display = 'block';
         }
 
-        // 💡 버튼에 따라 입력창의 안내문과 색상을 바꾸는 로직
         function showTextInput(statusType) {
-            pendingStatus = statusType; // 사용자가 뭘 눌렀는지 기억
-            
+            pendingStatus = statusType; 
             document.getElementById('modal-btn-section').style.display = 'none';
             document.getElementById('modal-text-section').style.display = 'block';
             
@@ -263,14 +374,13 @@
 
             if (statusType === '처리중') {
                 desc.innerText = "어떤 조치를 취할 계획인가요?";
-                textarea.placeholder = "예: 보완 자재 수급 후 조치 예정";
+                textarea.placeholder = "예: 처리 계획 수립 후 조치 예정";
                 submitBtn.className = "m-btn m-처리중";
             } else if (statusType === '완료') {
                 desc.innerText = "어떻게 조치하셨나요?";
-                textarea.placeholder = "예: 시설 보수 통한 조치 완료";
+                textarea.placeholder = "예: 위험부 조치 완료, 위험 물품 교체 완료";
                 submitBtn.className = "m-btn m-완료";
             }
-            
             textarea.value = "";
             textarea.focus();
         }
@@ -282,16 +392,10 @@
                 document.getElementById('modal-textarea').focus();
                 return; 
             }
-            
-            // 처리중이면 계획으로, 완료면 조치내역으로 전송
-            if (pendingStatus === '처리중') {
-                sendUpdate('처리중', '', textVal);
-            } else if (pendingStatus === '완료') {
-                sendUpdate('완료', textVal, '');
-            }
+            if (pendingStatus === '처리중') sendUpdate('처리중', '', textVal);
+            else if (pendingStatus === '완료') sendUpdate('완료', textVal, '');
         }
 
-        // 서버로 전송하는 함수
         function sendUpdate(newStatus, actionText = "", planText = "") {
             let editPw = localStorage.getItem('dashboard_edit_pw');
             if(!editPw) return;
@@ -303,29 +407,21 @@
             fetch(WEBAPP_URL, {
                 method: 'POST',
                 body: JSON.stringify({
-                    action: "update_status",
-                    row: targetRow,
-                    status: newStatus,
-                    edit_pw: editPw,
-                    action_taken: actionText,      // 조치내역
-                    treatment_plan: planText       // 처리계획
+                    action: "update_status", row: targetRow, status: newStatus,
+                    edit_pw: editPw, action_taken: actionText, treatment_plan: planText 
                 })
             })
             .then(res => res.json())
             .then(resData => {
                 if (resData.status === "error") {
                     alert("❌ " + resData.message);
-                    localStorage.removeItem('dashboard_edit_pw'); 
-                    closeModal();
+                    localStorage.removeItem('dashboard_edit_pw'); closeModal();
                 } else {
                     closeModal();
                     checkPassword(true); 
                 }
             })
-            .catch(err => {
-                alert("⚠️ 통신 오류가 발생했습니다.");
-                closeModal();
-            });
+            .catch(err => { alert("⚠️ 통신 오류가 발생했습니다."); closeModal(); });
         }
 
         function closeModal() {
