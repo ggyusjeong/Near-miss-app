@@ -23,8 +23,7 @@
         .filter-section { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; }
         .filter-section h2 { margin: 0; font-size: 18px; color: #333; }
         .filter-select { padding: 10px 15px; font-size: 15px; border-radius: 8px; border: 1px solid #ddd; background-color: #fff; font-family: 'Pretendard', sans-serif; cursor: pointer; outline: none; font-weight: bold; color: #333; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .filter-select:hover { border-color: #999; }
-
+        
         .summary-grid { display: grid; gap: 20px; margin-bottom: 30px; transition: 0.3s; }
         .grid-single { grid-template-columns: 1fr; } 
         .grid-double { grid-template-columns: 1fr 1fr; } 
@@ -44,7 +43,6 @@
             .summary-grid { grid-template-columns: 1fr !important; gap: 15px; }
         }
 
-        /* 💡 카드가 내용만큼만 길어지도록 align-items: start; 적용 */
         #dashboard-content { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; align-items: start; }
 
         .report-card { background: #f4f6f9; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; }
@@ -58,19 +56,16 @@
         .status-처리중 { background: #ff9800; }
         .status-완료 { background: #4caf50; }
 
-        /* 💡 내용글 클릭 시 펼쳐지는 아코디언 스타일 적용 */
+        /* 💡 3줄 제한 및 팝업창 호출을 유도하는 스타일 */
         .description { 
             font-size: 16px; color: #333; line-height: 1.6; white-space: pre-wrap; 
             cursor: pointer; padding: 8px; margin: -8px; border-radius: 6px; transition: background 0.2s;
-            /* 기본적으로 3줄까지만 보이고 말줄임표 처리 */
             display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; 
         }
-        .description:hover { background: #e9ecef; } /* 마우스를 올리면 옅은 회색으로 변해 클릭 유도 */
-        .description.expanded { 
-            /* 클릭 시 제한을 풀어 전체 내용이 아래로 스르륵 펴짐 */
-            display: block; -webkit-line-clamp: unset; 
-        }
+        .description:hover { background: #e9ecef; }
         
+        /* 💡 3가지 상태별 박스 스타일 (접수 상태 박스 추가) */
+        .wait-result { background: #f0f2f5; border-left: 4px solid #9aa0a6; padding: 12px; margin-top: 15px; border-radius: 4px; font-size: 14px; color: #5f6368; line-height: 1.5; white-space: pre-wrap; }
         .plan-result { background: #fff3e0; border-left: 4px solid #ff9800; padding: 12px; margin-top: 15px; border-radius: 4px; font-size: 14px; color: #e65100; line-height: 1.5; white-space: pre-wrap; }
         .action-result { background: #e8f5e9; border-left: 4px solid #4caf50; padding: 12px; margin-top: 15px; border-radius: 4px; font-size: 14px; color: #2e7d32; line-height: 1.5; white-space: pre-wrap; }
         
@@ -95,6 +90,12 @@
         #modal-text-section button { width: 100%; }
 
         .btn-modal-close { margin-top: 20px; background: transparent; border: none; color: #888; font-size: 14px; cursor: pointer; padding: 5px; }
+
+        /* 💡 내용 보기 전용 팝업 디자인 */
+        .content-modal-box { width: 340px; text-align: left; }
+        .full-text-area { font-size: 16px; color: #333; line-height: 1.6; white-space: pre-wrap; background: #f4f6f9; padding: 15px; border-radius: 8px; max-height: 350px; overflow-y: auto; }
+        .full-text-area::-webkit-scrollbar { width: 6px; }
+        .full-text-area::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -122,7 +123,6 @@
             </div>
 
             <div class="summary-grid grid-single" id="main-summary-grid">
-                
                 <div class="summary-box">
                     <div class="summary-title">📈 전체 누적 현황</div>
                     <div class="summary-items-wrap">
@@ -150,17 +150,15 @@
         </div>
     </div>
 
-    <!-- 모달창 영역 -->
+    <!-- 상태 변경용 팝업 모달창 -->
     <div id="custom-modal" class="modal-overlay">
         <div class="modal-box">
             <h3 id="modal-title">⚙️ 상태 변경</h3>
-            
             <div id="modal-pw-section" style="display:none;">
                 <p style="font-size:14px; color:#666; margin-bottom:15px;">관리자 비밀번호를 입력하세요.</p>
                 <input type="password" id="edit-pw-input" placeholder="비밀번호" onkeypress="if(event.keyCode==13) savePwAndShowButtons()">
                 <button onclick="savePwAndShowButtons()">확인</button>
             </div>
-
             <div id="modal-btn-section" style="display:none;">
                 <div class="modal-buttons">
                     <button class="m-btn m-접수" onclick="sendUpdate('접수')">접수</button>
@@ -168,25 +166,31 @@
                     <button class="m-btn m-완료" onclick="showTextInput('완료')">완료 (조치내역 입력)</button>
                 </div>
             </div>
-
             <div id="modal-text-section" style="display:none;">
                 <p id="modal-text-desc" style="font-size:14px; color:#666; margin-bottom:10px;">어떻게 조치하실 계획인가요?</p>
                 <textarea id="modal-textarea" rows="3"></textarea>
                 <button id="modal-submit-btn" class="m-btn" onclick="submitStatus()">최종 등록</button>
             </div>
-
             <button class="btn-modal-close" onclick="closeModal()">취소 및 닫기</button>
         </div>
     </div>
 
+    <!-- 💡 내용 상세 보기 전용 팝업 모달창 추가 -->
+    <div id="content-read-modal" class="modal-overlay">
+        <div class="modal-box content-modal-box">
+            <h3 style="text-align: center; margin-bottom: 15px;">📝 신고 내용 상세</h3>
+            <div id="full-description-text" class="full-text-area"></div>
+            <button class="m-btn m-접수" style="width: 100%; margin-top: 15px; background: #333;" onclick="closeContentModal()">닫기</button>
+        </div>
+    </div>
+
     <script>
-        // 🔴 웹앱 URL을 잊지 말고 입력해 주세요!
+        // 🔴 웹앱 URL을 입력해 주세요!
         const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxev7No0cR4LT2zangeNY79zQpi4OP3f-9ujmxWGSbq5VlO3vZCSaCJWjlpeufjMyKT/exec";
         
         let autoRefreshTimer = null;
         let targetRow = null; 
         let pendingStatus = ""; 
-        
         let allReportsData = []; 
         let currentFilter = "all";
 
@@ -251,9 +255,7 @@
 
             let months = Array.from(monthSet).sort((a,b) => b.localeCompare(a)); 
             let optionsHtml = '<option value="all">전체 기간 보기</option>';
-            months.forEach(m => {
-                optionsHtml += `<option value="${m}">${m}</option>`;
-            });
+            months.forEach(m => { optionsHtml += `<option value="${m}">${m}</option>`; });
             
             select.innerHTML = optionsHtml;
             
@@ -318,14 +320,20 @@
                         countNew++; displayStatus = "접수"; badgeClass = "status-접수";
                     }
 
+                    // 💡 모든 상태에 하단 박스를 채워 균형을 맞춥니다.
                     let actionHtml = '';
                     if (displayStatus === "완료" && item.action_taken) {
                         actionHtml = `<div class="action-result"><strong>✅ 조치 내역:</strong><br>${item.action_taken}</div>`;
                     } else if (displayStatus === "처리중" && item.treatment_plan) {
                         actionHtml = `<div class="plan-result"><strong>🚧 처리 계획:</strong><br>${item.treatment_plan}</div>`;
+                    } else if (displayStatus === "처리중") {
+                        actionHtml = `<div class="plan-result"><strong>🚧 처리 계획:</strong><br>입력된 계획이 없습니다.</div>`;
+                    } else {
+                        // 접수 상태일 때 기본 대기 박스 표시
+                        actionHtml = `<div class="wait-result"><strong>⏳ 조치 대기 중</strong><br>담당자가 내용을 확인하고 있습니다.</div>`;
                     }
 
-                    // 💡 설명글(description)에 onclick="this.classList.toggle('expanded')" 추가
+                    // 💡 description 클릭 시 상세 보기 팝업(showContentModal) 호출
                     return `
                     <div class="report-card">
                         <div class="report-header">
@@ -333,7 +341,7 @@
                             <span class="date-text">${item.date}</span>
                             <span class="status-badge ${badgeClass}" onclick="openModal(${item.row})" title="상태 변경 (클릭)">${displayStatus} 🔄</span>
                         </div>
-                        <div class="description" onclick="this.classList.toggle('expanded')" title="클릭해서 내용 펴기/접기">${item.description}</div>
+                        <div class="description" onclick="showContentModal(${item.row})" title="클릭해서 전체 내용 보기">${item.description}</div>
                         ${actionHtml}
                     </div>
                     `;
@@ -347,11 +355,23 @@
             document.getElementById('count-done').innerText = countDone;
         }
 
-        // 상태 변경 팝업 모달 함수들
+        // 💡 [새 기능] 상세 내용 팝업창 열기/닫기 함수
+        function showContentModal(rowId) {
+            // 전체 데이터 배열에서 해당 카드의 데이터를 찾아옵니다.
+            const item = allReportsData.find(r => r.row === rowId);
+            if(item) {
+                document.getElementById('full-description-text').innerText = item.description;
+                document.getElementById('content-read-modal').style.display = 'flex';
+            }
+        }
+        function closeContentModal() {
+            document.getElementById('content-read-modal').style.display = 'none';
+        }
+
+        // 상태 변경 팝업 모달 함수들 (기존 동일)
         function openModal(rowId) {
             targetRow = rowId;
             document.getElementById('custom-modal').style.display = 'flex';
-            
             let editPw = localStorage.getItem('dashboard_edit_pw');
             if (!editPw) {
                 document.getElementById('modal-pw-section').style.display = 'block';
@@ -377,18 +397,17 @@
             pendingStatus = statusType; 
             document.getElementById('modal-btn-section').style.display = 'none';
             document.getElementById('modal-text-section').style.display = 'block';
-            
             const desc = document.getElementById('modal-text-desc');
             const textarea = document.getElementById('modal-textarea');
             const submitBtn = document.getElementById('modal-submit-btn');
 
             if (statusType === '처리중') {
                 desc.innerText = "어떤 조치를 취할 계획인가요?";
-                textarea.placeholder = "예: 내일 오전 중으로 자재 수급 후 교체 예정";
+                textarea.placeholder = "예: 안전 자재 수급 후 조치 예정";
                 submitBtn.className = "m-btn m-처리중";
             } else if (statusType === '완료') {
                 desc.innerText = "어떻게 조치하셨나요?";
-                textarea.placeholder = "예: 파손된 안전펜스 교체 완료";
+                textarea.placeholder = "예: 안전 조치 완료, 물품 교체 완료";
                 submitBtn.className = "m-btn m-완료";
             }
             textarea.value = "";
@@ -397,11 +416,7 @@
 
         function submitStatus() {
             const textVal = document.getElementById('modal-textarea').value.trim();
-            if(!textVal) { 
-                alert("내용을 입력해주세요!"); 
-                document.getElementById('modal-textarea').focus();
-                return; 
-            }
+            if(!textVal) { alert("내용을 입력해주세요!"); document.getElementById('modal-textarea').focus(); return; }
             if (pendingStatus === '처리중') sendUpdate('처리중', '', textVal);
             else if (pendingStatus === '완료') sendUpdate('완료', textVal, '');
         }
@@ -426,10 +441,7 @@
                 if (resData.status === "error") {
                     alert("❌ " + resData.message);
                     localStorage.removeItem('dashboard_edit_pw'); closeModal();
-                } else {
-                    closeModal();
-                    checkPassword(true); 
-                }
+                } else { closeModal(); checkPassword(true); }
             })
             .catch(err => { alert("⚠️ 통신 오류가 발생했습니다."); closeModal(); });
         }
