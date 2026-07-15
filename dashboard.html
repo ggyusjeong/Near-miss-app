@@ -11,7 +11,7 @@
         .container { max-width: 1400px; margin: 0 auto; }
         
         .header-section { text-align: center; margin-bottom: 30px; }
-        .logo-img { max-width: 250px; margin-bottom: 10px; border-radius: 8px; }
+        .logo-img { max-width: 150px; margin-bottom: 10px; border-radius: 8px; }
         h1 { color: #1a1a1a; font-size: 26px; margin: 0; font-weight: 800; }
         
         #login-screen { text-align: center; background: #ffffff; padding: 40px 20px; border-radius: 12px; border: 1px solid #eee; margin-top: 10vh; max-width: 400px; margin-left: auto; margin-right: auto; }
@@ -47,7 +47,9 @@
         .status-badge:hover { opacity: 0.8; transform: scale(1.05); }
         .status-접수 { background: #ff4b4b; } .status-처리중 { background: #ff9800; } .status-완료 { background: #4caf50; }
 
-        .linked-badge { background: #e3f2fd; color: #1976d2; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; margin-bottom: 10px; border: 1px solid #bbdefb; display: inline-block; }
+        /* 💡 연계 뱃지에 클릭 기능(포인터)과 호버(크기 커짐) 효과 추가 */
+        .linked-badge { background: #e3f2fd; color: #1976d2; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; margin-bottom: 10px; border: 1px solid #bbdefb; display: inline-block; cursor: pointer; transition: 0.2s; }
+        .linked-badge:hover { background: #bbdefb; transform: scale(1.02); }
 
         .description { font-size: 16px; color: #333; line-height: 1.6; white-space: pre-wrap; cursor: pointer; padding: 8px; margin: -8px; border-radius: 6px; transition: background 0.2s; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
         .description:hover { background: #e9ecef; }
@@ -93,14 +95,14 @@
         <!-- 대시보드 -->
         <div id="dashboard-main">
             <div class="header-section">
-                <img src="logo.jpg" alt="로고" class="logo-img" onerror="this.style.display='none'">
+                <!-- 로고 이미지 -->
+                <img src="logo.jpg" alt="로고" class="logo-img" onerror="console.error('로고 파일을 찾을 수 없습니다.'); this.style.display='none';">
                 <h1>실시간 아차사고 신고 현황판</h1>
             </div>
             
             <div class="filter-section">
                 <h2>📊 요약 현황</h2>
                 <div style="display: flex; gap: 10px; align-items: center;">
-                    <!-- 💡 권한에 따라 노출/숨김 처리되는 버튼들 -->
                     <button id="btn-admin-login" class="btn-report" style="background:#666;" onclick="adminLogin()">🔒 관리자</button>
                     <button id="btn-report-export" class="btn-report" style="display:none; background:#1976d2;" onclick="generateReport()">📑 보고서 출력</button>
                     <select id="month-filter" class="filter-select" onchange="applyFilter()"><option value="all">전체 기간 보기</option></select>
@@ -126,14 +128,17 @@
                 </div>
             </div>
 
+            <!-- 현재 적용된 필터(장소 또는 연계그룹) 뱃지가 뜨는 곳 -->
             <div id="active-location-filter" style="display: none; text-align: center;"></div>
+            
             <div id="dashboard-content"></div>
+            
             <button id="btn-load-more" class="btn-load-more" onclick="loadMore()" style="display: none;">➕ 더보기</button>
             <a href="index.html" class="btn-home">⬅️ 신고 페이지로 돌아가기</a>
         </div>
     </div>
 
-    <!-- 모달창: 상태변경 -->
+    <!-- 모달창들 (상태변경, 내용확인, 로딩 등...) -->
     <div id="custom-modal" class="modal-overlay">
         <div class="modal-box">
             <h3 id="modal-title">⚙️ 상태 변경</h3>
@@ -161,7 +166,6 @@
         </div>
     </div>
 
-    <!-- 모달창: 상세 읽기 -->
     <div id="content-read-modal" class="modal-overlay">
         <div class="modal-box content-modal-box">
             <h3 style="text-align: center; margin-bottom: 15px;">📝 신고 내용 상세</h3>
@@ -170,7 +174,6 @@
         </div>
     </div>
 
-    <!-- 로딩 오버레이 -->
     <div id="loading-overlay" class="modal-overlay" style="z-index: 9999;">
         <div style="background: white; padding: 30px; border-radius: 12px; text-align: center;">
             <h3>⏳ 문서 생성 중...</h3>
@@ -179,12 +182,17 @@
     </div>
 
     <script>
-        // 🔴 웹앱 URL 입력
+        // 🔴 웹앱 URL (배포된 최신 주소 유지)
         const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxev7No0cR4LT2zangeNY79zQpi4OP3f-9ujmxWGSbq5VlO3vZCSaCJWjlpeufjMyKT/exec";
         
         let autoRefreshTimer = null; let targetRow = null; let pendingStatus = ""; 
         let allReportsData = []; let currentFilter = "all"; let displayLimit = 12;
-        let locationFilter = null; let selectedLinkedRows = []; 
+        let locationFilter = null; 
+        
+        // 💡 [신규] 연계 그룹 필터용 변수 추가
+        let linkedGroupFilter = null; 
+        
+        let selectedLinkedRows = []; 
 
         document.addEventListener("DOMContentLoaded", function() {
             const savedPw = localStorage.getItem('dashboard_pw');
@@ -213,7 +221,7 @@
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('dashboard-main').style.display = 'block';
                 
-                checkAdminUi(); // 💡 접속 시 관리자 권한 여부 체크
+                checkAdminUi();
 
                 allReportsData = data.reverse(); 
                 updateFilterDropdown(); renderDashboard();
@@ -221,7 +229,6 @@
             });
         }
 
-        // 💡 [신규] 관리자 UI 체크 및 전환 함수
         function checkAdminUi() {
             if (localStorage.getItem('dashboard_edit_pw')) {
                 document.getElementById('btn-admin-login').style.display = 'none';
@@ -251,8 +258,31 @@
 
         function applyFilter() { currentFilter = document.getElementById('month-filter').value; displayLimit = 12; renderDashboard(); }
         function loadMore() { displayLimit += 12; renderDashboard(); }
-        function filterByLocation(loc) { locationFilter = loc; displayLimit = 12; renderDashboard(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        function clearLocationFilter() { locationFilter = null; renderDashboard(); }
+        
+        // 💡 [수정] 장소 필터 클릭 시 다른 필터 해제
+        function filterByLocation(loc) { 
+            linkedGroupFilter = null; 
+            locationFilter = loc; 
+            displayLimit = 12; 
+            renderDashboard(); 
+            window.scrollTo({ top: 0, behavior: 'smooth' }); 
+        }
+
+        // 💡 [신규] 연계 그룹 필터 클릭 시 동작
+        function filterByLinkedGroup(groupStr) { 
+            locationFilter = null; 
+            linkedGroupFilter = groupStr; 
+            displayLimit = 12; 
+            renderDashboard(); 
+            window.scrollTo({ top: 0, behavior: 'smooth' }); 
+        }
+
+        // 💡 [수정] 모든 활성 필터(장소, 그룹)를 끄는 공통 함수
+        function clearActiveFilters() { 
+            locationFilter = null; 
+            linkedGroupFilter = null; 
+            renderDashboard(); 
+        }
 
         function renderDashboard() {
             const contentDiv = document.getElementById('dashboard-content');
@@ -263,8 +293,15 @@
             });
             document.getElementById('total-count-new').innerText = totalNew; document.getElementById('total-count-ing').innerText = totalIng; document.getElementById('total-count-done').innerText = totalDone;
 
+            // 월별 필터링
             let filtered = currentFilter === "all" ? allReportsData : allReportsData.filter(i => extractMonth(i.date) === currentFilter);
-            if (locationFilter) filtered = filtered.filter(i => i.location === locationFilter);
+            
+            // 💡 [수정] 장소 필터링 또는 연계 그룹 필터링 적용
+            if (locationFilter) {
+                filtered = filtered.filter(i => i.location === locationFilter);
+            } else if (linkedGroupFilter) {
+                filtered = filtered.filter(i => String(i.linked_group) === String(linkedGroupFilter));
+            }
 
             document.getElementById('filter-summary-box').style.display = currentFilter === "all" ? 'none' : 'block';
             document.getElementById('main-summary-grid').className = currentFilter === "all" ? 'summary-grid grid-single' : 'summary-grid grid-double';
@@ -277,8 +314,16 @@
             });
             document.getElementById('count-new').innerText = cNew; document.getElementById('count-ing').innerText = cIng; document.getElementById('count-done').innerText = cDone;
             
-            document.getElementById('active-location-filter').innerHTML = locationFilter ? `<span class="active-filter-tag" onclick="clearLocationFilter()">🔗 [${locationFilter}] 동일 장소 연계 모아보기 ✖️</span>` : "";
-            document.getElementById('active-location-filter').style.display = locationFilter ? 'block' : 'none';
+            // 💡 [수정] 활성화된 필터 뱃지(태그) 화면 상단에 표시
+            let activeFilterHtml = "";
+            if (locationFilter) {
+                activeFilterHtml = `<span class="active-filter-tag" onclick="clearActiveFilters()" title="클릭 시 해제">📍 [${locationFilter}] 동일 장소 모아보기 ✖️</span>`;
+            } else if (linkedGroupFilter) {
+                let groupNumbers = String(linkedGroupFilter).split(',').map(n => parseInt(n) - 1).join(', #');
+                activeFilterHtml = `<span class="active-filter-tag" onclick="clearActiveFilters()" title="클릭 시 해제">🔗 통합 처리 건 (#${groupNumbers} 번) 모아보기 ✖️</span>`;
+            }
+            document.getElementById('active-location-filter').innerHTML = activeFilterHtml;
+            document.getElementById('active-location-filter').style.display = activeFilterHtml ? 'block' : 'none';
 
             contentDiv.innerHTML = filtered.length === 0 ? '<div class="empty-msg">데이터가 없습니다.</div>' : filtered.slice(0, displayLimit).map(i => {
                 let status = i.status || "접수", b = status.includes("완료") ? "status-완료" : (status.includes("처리중") ? "status-처리중" : "status-접수");
@@ -288,16 +333,19 @@
                 else if (status.includes("처리중")) action = `<div class="plan-result"><strong>🚧 처리 계획:</strong><br>입력된 계획이 없습니다.</div>`;
                 else action = `<div class="wait-result"><strong>⏳ 조치 대기 중</strong><br>담당자가 내용을 확인하고 있습니다.</div>`;
                 
+                // 💡 [수정] 연계 뱃지에 클릭 기능(onclick) 연결
                 let linkBadgeHtml = '';
                 if (i.linked_group) {
                     let others = String(i.linked_group).split(',').map(n => parseInt(n) - 1).filter(n => n !== (i.row - 1));
-                    if(others.length > 0) linkBadgeHtml = `<div class="linked-badge">🔗 통합 처리 건 (#${others.join(', #')} 번)</div>`;
+                    if(others.length > 0) {
+                        linkBadgeHtml = `<div class="linked-badge" onclick="filterByLinkedGroup('${i.linked_group}')" title="클릭 시 묶여있는 통합 건들만 모아봅니다">🔗 통합 처리 건 (#${others.join(', #')} 번)</div>`;
+                    }
                 }
 
                 return `
                 <div class="report-card">
                     <div class="report-header">
-                        <span class="report-id">#${i.row-1}</span><span class="location-badge" onclick="filterByLocation('${i.location}')">📍 ${i.location}</span><span class="date-text">${i.date}</span><span class="status-badge ${b}" onclick="openModal(${i.row})">${status} 🔄</span>
+                        <span class="report-id">#${i.row-1}</span><span class="location-badge" onclick="filterByLocation('${i.location}')" title="클릭 시 장소로 모아봅니다">📍 ${i.location}</span><span class="date-text">${i.date}</span><span class="status-badge ${b}" onclick="openModal(${i.row})">${status} 🔄</span>
                     </div>
                     ${linkBadgeHtml}<div class="description" onclick="showContentModal(${i.row})">${i.description}</div>${action}
                 </div>`;
@@ -307,50 +355,37 @@
             if(filtered.length > displayLimit) document.getElementById('btn-load-more').innerText = `➕ 더보기 (${displayLimit} / ${filtered.length})`;
         }
 
-function generateReport() {
-    let editPw = localStorage.getItem('dashboard_edit_pw');
-    if (!editPw) {
-        alert("관리자 권한이 필요합니다.");
-        checkAdminUi();
-        return;
-    }
+        function generateReport() {
+            let editPw = localStorage.getItem('dashboard_edit_pw');
+            if (!editPw) { alert("관리자 권한이 필요합니다."); checkAdminUi(); return; }
 
-    const targetMonth = document.getElementById('month-filter').value;
-    document.getElementById('loading-overlay').style.display = 'flex';
+            const targetMonth = document.getElementById('month-filter').value;
+            document.getElementById('loading-overlay').style.display = 'flex';
 
-    // 💡 fetch에 타임아웃 설정을 추가하고 대기 시간을 늘립니다.
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 60000); // 30초까지 기다림
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000); 
 
-    fetch(WEBAPP_URL, {
-        method: 'POST',
-        signal: controller.signal, // 타임아웃 적용
-        body: JSON.stringify({ action: "generate_report", edit_pw: editPw, target_month: targetMonth })
-    })
-    .then(res => {
-        clearTimeout(timeoutId);
-        return res.json();
-    })
-    .then(resData => {
-        document.getElementById('loading-overlay').style.display = 'none';
-        if (resData.status === "error") {
-            alert("❌ 에러 발생: " + resData.message);
-            if (resData.message.includes("권한")) {
-                localStorage.removeItem('dashboard_edit_pw');
-                checkAdminUi();
-            }
-        } else {
-            alert("✅ 보고서가 성공적으로 생성되었습니다!");
-            window.open(resData.url, '_blank');
+            fetch(WEBAPP_URL, {
+                method: 'POST',
+                signal: controller.signal,
+                body: JSON.stringify({ action: "generate_report", edit_pw: editPw, target_month: targetMonth })
+            })
+            .then(res => { clearTimeout(timeoutId); return res.json(); })
+            .then(resData => {
+                document.getElementById('loading-overlay').style.display = 'none';
+                if (resData.status === "error") {
+                    alert("❌ 에러 발생: " + resData.message);
+                    if (resData.message.includes("권한")) { localStorage.removeItem('dashboard_edit_pw'); checkAdminUi(); }
+                } else {
+                    alert("✅ 보고서가 성공적으로 생성되었습니다!"); window.open(resData.url, '_blank');
+                }
+            })
+            .catch(err => { 
+                document.getElementById('loading-overlay').style.display = 'none';
+                console.error(err); alert("⚠️ 통신 오류가 발생했습니다. 구글 서버 상태 불안정이 원인일 수 있습니다."); 
+            });
         }
-    })
-    .catch(err => { 
-        document.getElementById('loading-overlay').style.display = 'none';
-        // 에러 상세 내용 확인
-        console.error(err);
-        alert("⚠️ 통신 오류가 발생했습니다. 구글 서버 상태가 불안정하거나 문서 생성 권한 문제일 수 있습니다."); 
-    });
-}
+
         function showContentModal(r) { const i = allReportsData.find(x => x.row === r); document.getElementById('full-description-text').innerText = i.description; document.getElementById('content-read-modal').style.display = 'flex'; }
         function closeContentModal() { document.getElementById('content-read-modal').style.display = 'none'; }
         
@@ -370,7 +405,7 @@ function generateReport() {
             if(!pw) { alert("비밀번호를 입력해주세요."); return; }
             localStorage.setItem('dashboard_edit_pw', pw);
             document.getElementById('modal-pw-section').style.display = 'none'; document.getElementById('modal-btn-section').style.display = 'block';
-            checkAdminUi(); // 로그인 완료 시 보고서 버튼도 보이게 업데이트
+            checkAdminUi();
         }
 
         function showTextInput(statusType) {
@@ -403,8 +438,12 @@ function generateReport() {
             const checkedBoxes = document.querySelectorAll('#duplicate-checkbox-list input[type="checkbox"]:checked');
             selectedLinkedRows = Array.from(checkedBoxes).map(cb => parseInt(cb.value));
             if(selectedLinkedRows.length === 0) { alert("최소 1개의 신고 건을 체크해주세요."); return; }
+            
+            const textarea = document.getElementById('modal-textarea');
             const rowsStr = selectedLinkedRows.map(r => "#" + (r - 1)).join(", ");
-            document.getElementById('modal-textarea').value = pendingStatus === '처리중' ? `[연계 처리] ${rowsStr}번 신고건들과 통합하여 조치 진행 예정입니다.` : `[중복 통합] ${rowsStr}번 신고건들과 연계하여 조치 완료하였습니다.`;
+            const linkMsg = pendingStatus === '처리중' ? `[연계 통합] #${rowsStr}번 신고건과 연계됨` : `[연계 통합] #${rowsStr}번 신고건과 연계 완료`;
+            
+            if (textarea.value.trim() !== "") { textarea.value = textarea.value + "\n" + linkMsg; } else { textarea.value = linkMsg; }
             cancelDuplicateLink();
         }
 
