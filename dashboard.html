@@ -22,32 +22,41 @@
         
         .filter-section { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; }
         .filter-select { padding: 10px 15px; font-size: 15px; border-radius: 8px; border: 1px solid #ddd; background-color: #fff; font-family: 'Pretendard', sans-serif; cursor: pointer; outline: none; font-weight: bold; color: #333; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        
         .active-filter-tag { display: inline-block; background: #e3f2fd; color: #1976d2; padding: 8px 16px; border-radius: 20px; font-size: 15px; font-weight: bold; margin-bottom: 20px; cursor: pointer; border: 1px solid #bbdefb; }
         
         .summary-grid { display: grid; gap: 20px; margin-bottom: 30px; transition: 0.3s; }
-        .grid-single { grid-template-columns: 1fr; } .grid-double { grid-template-columns: 1fr 1fr; } 
+        .grid-single { grid-template-columns: 1fr; } 
+        .grid-double { grid-template-columns: 1fr 1fr; } 
+        
         .summary-box { background: #f4f6f9; padding: 20px 10px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .summary-title { text-align: center; font-size: 15px; font-weight: bold; color: #333; margin-bottom: 15px; background: #e1e4e8; padding: 5px; border-radius: 6px; width: fit-content; margin-left: auto; margin-right: auto; }
         .summary-items-wrap { display: flex; justify-content: space-around; }
+        
         .summary-item { text-align: center; font-size: 15px; color: #666; font-weight: 600; width: 33%; border-right: 1px solid #e1e4e8; }
         .summary-item:last-child { border-right: none; }
         .summary-num { display: block; font-size: 28px; font-weight: 800; margin-top: 8px; }
-        .num-new { color: #ff4b4b; } .num-ing { color: #ff9800; } .num-done { color: #4caf50; }
+        .num-new { color: #ff4b4b; }
+        .num-ing { color: #ff9800; }
+        .num-done { color: #4caf50; }
 
         @media (max-width: 768px) { .summary-grid { grid-template-columns: 1fr !important; gap: 15px; } }
 
         #dashboard-content { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; align-items: start; }
+
         .report-card { background: #f4f6f9; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; }
         .report-header { display: flex; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #e1e4e8; padding-bottom: 12px; flex-wrap: wrap; gap: 8px; }
         .report-id { font-weight: 900; color: #222; font-size: 16px; margin-right: 5px; }
         .location-badge { background: #333; color: white; padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .location-badge:hover { background: #1976d2; transform: scale(1.05); }
+
         .date-text { color: #888; font-size: 12px; }
         .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; color: white; margin-left: auto; cursor: pointer; transition: 0.2s; }
         .status-badge:hover { opacity: 0.8; transform: scale(1.05); }
-        .status-접수 { background: #ff4b4b; } .status-처리중 { background: #ff9800; } .status-완료 { background: #4caf50; }
-
-        /* 💡 연계된 항목 표시 뱃지 */
+        .status-접수 { background: #ff4b4b; }
+        .status-처리중 { background: #ff9800; }
+        .status-완료 { background: #4caf50; }
+        
         .linked-badge { background: #e3f2fd; color: #1976d2; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; margin-bottom: 10px; border: 1px solid #bbdefb; display: inline-block; }
 
         .description { font-size: 16px; color: #333; line-height: 1.6; white-space: pre-wrap; cursor: pointer; padding: 8px; margin: -8px; border-radius: 6px; transition: background 0.2s; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
@@ -56,6 +65,7 @@
         .wait-result { background: #f0f2f5; border-left: 4px solid #9aa0a6; padding: 12px; margin-top: 15px; border-radius: 4px; font-size: 14px; color: #5f6368; line-height: 1.5; white-space: pre-wrap; }
         .plan-result { background: #fff3e0; border-left: 4px solid #ff9800; padding: 12px; margin-top: 15px; border-radius: 4px; font-size: 14px; color: #e65100; line-height: 1.5; white-space: pre-wrap; }
         .action-result { background: #e8f5e9; border-left: 4px solid #4caf50; padding: 12px; margin-top: 15px; border-radius: 4px; font-size: 14px; color: #2e7d32; line-height: 1.5; white-space: pre-wrap; }
+        
         .empty-msg { text-align: center; color: #888; padding: 30px; background: #f4f6f9; border-radius: 12px; grid-column: 1 / -1; font-size: 16px; }
         .btn-load-more { display: block; width: 100%; max-width: 300px; margin: 30px auto; padding: 14px; font-size: 16px; font-weight: bold; background: #333; color: white; border: none; border-radius: 30px; cursor: pointer; }
         .btn-home { display: block; width: 200px; margin: 40px auto 0 auto; text-align: center; background: #fff; color: #333; border: 1px solid #ddd; padding: 12px 0; border-radius: 8px; text-decoration: none; font-weight: bold; }
@@ -63,8 +73,14 @@
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; justify-content: center; align-items: center; backdrop-filter: blur(3px); }
         .modal-box { background: white; padding: 30px 25px; border-radius: 16px; width: 280px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
         .modal-buttons { display: flex; flex-direction: column; gap: 10px; }
+        
         .m-btn { border: none; padding: 14px; border-radius: 8px; font-weight: bold; color: white; cursor: pointer; font-size: 16px; transition: 0.2s;}
         .m-btn:hover { filter: brightness(1.1); }
+        
+        /* 💡 복구된 팝업창 버튼 색상 코드! */
+        .m-접수 { background: #ff4b4b; } 
+        .m-처리중 { background: #ff9800; } 
+        .m-완료 { background: #4caf50; }
         
         #modal-pw-section input { width: 90%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; outline: none; text-align: center; font-size: 16px; }
         #modal-pw-section button { background: #333; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; font-size: 16px; }
@@ -138,14 +154,12 @@
             </div>
             
             <div id="modal-text-section" style="display:none;">
-                <!-- 연계 버튼: 상황에 따라 보이고 숨겨짐 -->
                 <button id="btn-show-link" class="m-btn btn-link-duplicate" onclick="showDuplicateSelector()">🔗 다른 신고 건과 연계하기</button>
                 <p id="modal-text-desc" style="font-size:14px; color:#666; margin-bottom:10px;">어떻게 조치하실 계획인가요?</p>
                 <textarea id="modal-textarea" rows="3"></textarea>
                 <button id="modal-submit-btn" class="m-btn" style="width:100%;" onclick="submitStatus()">최종 등록</button>
             </div>
             
-            <!-- 다중 체크박스 선택 영역 -->
             <div id="modal-duplicate-section" style="display:none;">
                 <p style="font-size:14px; color:#666; margin-bottom:10px;">연계할 신고 건들을 체크하세요.</p>
                 <div id="duplicate-checkbox-list" style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px; padding: 10px; margin-bottom: 15px; text-align: left;">
@@ -168,10 +182,9 @@
     </div>
 
     <script>
-        // 🔴 웹앱 URL 입력!
+        // 🔴 웹앱 URL 입력
         const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxev7No0cR4LT2zangeNY79zQpi4OP3f-9ujmxWGSbq5VlO3vZCSaCJWjlpeufjMyKT/exec";
         
-        // 💡 모든 상태 관리용 전역 변수들
         let autoRefreshTimer = null;
         let targetRow = null; 
         let pendingStatus = ""; 
@@ -179,7 +192,7 @@
         let currentFilter = "all";
         let displayLimit = 12;
         let locationFilter = null; 
-        let selectedLinkedRows = []; // 새로 선택된 연계 행들
+        let selectedLinkedRows = []; 
 
         document.addEventListener("DOMContentLoaded", function() {
             const savedPw = localStorage.getItem('dashboard_pw');
@@ -265,17 +278,14 @@
             contentDiv.innerHTML = filtered.length === 0 ? '<div class="empty-msg">데이터가 없습니다.</div>' : filtered.slice(0, displayLimit).map(i => {
                 let status = i.status || "접수", b = status.includes("완료") ? "status-완료" : (status.includes("처리중") ? "status-처리중" : "status-접수");
                 
-                // 조치 박스
                 let action = '';
                 if (status.includes("완료") && i.action_taken) action = `<div class="action-result"><strong>✅ 조치 내역:</strong><br>${i.action_taken}</div>`;
                 else if (status.includes("처리중") && i.treatment_plan) action = `<div class="plan-result"><strong>🚧 처리 계획:</strong><br>${i.treatment_plan}</div>`;
                 else if (status.includes("처리중")) action = `<div class="plan-result"><strong>🚧 처리 계획:</strong><br>입력된 계획이 없습니다.</div>`;
                 else action = `<div class="wait-result"><strong>⏳ 조치 대기 중</strong><br>담당자가 내용을 확인하고 있습니다.</div>`;
                 
-                // 💡 그룹으로 묶여있는지 확인하여 카드 내부에 뱃지 표시
                 let linkBadgeHtml = '';
                 if (i.linked_group) {
-                    // 본인 번호를 제외한 연계 번호들을 배열로 생성
                     let others = String(i.linked_group).split(',').map(n => parseInt(n) - 1).filter(n => n !== (i.row - 1));
                     if(others.length > 0) {
                         linkBadgeHtml = `<div class="linked-badge">🔗 통합 처리 건 (#${others.join(', #')} 번)</div>`;
@@ -307,11 +317,10 @@
         }
         function closeContentModal() { document.getElementById('content-read-modal').style.display = 'none'; }
         
-        // 💡 모달 오픈 시 철저한 상태 초기화 (캐시 잔존 버그 픽스)
         function openModal(r) { 
             targetRow = r; 
             pendingStatus = "";
-            selectedLinkedRows = []; // 선택 목록 리셋
+            selectedLinkedRows = []; 
             document.getElementById('modal-textarea').value = ""; 
             
             document.getElementById('custom-modal').style.display = 'flex'; 
@@ -348,7 +357,6 @@
             const item = allReportsData.find(x => x.row === targetRow);
             const isGrouped = item && item.linked_group ? true : false;
             
-            // 💡 이미 연계 그룹에 속해 있고, '완료' 처리를 누른 경우
             if (isGrouped && statusType === '완료') {
                 document.getElementById('btn-show-link').style.display = 'none';
                 document.getElementById('modal-text-desc').innerText = "어떻게 조치하셨나요? (묶여있는 건들이 모두 동시에 완료됩니다.)";
@@ -362,14 +370,12 @@
             document.getElementById('modal-textarea').focus();
         }
 
-        // 💡 체크박스 생성 로직
         function showDuplicateSelector() {
             document.getElementById('modal-text-section').style.display = 'none';
             document.getElementById('common-close-btn-wrap').style.display = 'none';
             document.getElementById('modal-duplicate-section').style.display = 'block';
 
             let html = '';
-            // 완료되지 않은 최신 건들 위주로 보여줌 (너무 길어지면 방해되므로)
             allReportsData.forEach(item => {
                 let s = item.status || "접수";
                 if(item.row !== targetRow && !s.includes("완료")) {
@@ -388,15 +394,11 @@
             document.getElementById('duplicate-checkbox-list').innerHTML = html || '<p style="color:#666;">연계할 수 있는 미완료 신고가 없습니다.</p>';
         }
 
-        // 💡 체크박스 선택 적용 로직
         function applyDuplicateLink() {
             const checkedBoxes = document.querySelectorAll('#duplicate-checkbox-list input[type="checkbox"]:checked');
             selectedLinkedRows = Array.from(checkedBoxes).map(cb => parseInt(cb.value));
             
-            if(selectedLinkedRows.length === 0) {
-                alert("최소 1개의 신고 건을 체크해주세요.");
-                return;
-            }
+            if(selectedLinkedRows.length === 0) { alert("최소 1개의 신고 건을 체크해주세요."); return; }
 
             const textarea = document.getElementById('modal-textarea');
             const rowsStr = selectedLinkedRows.map(r => "#" + (r - 1)).join(", ");
@@ -422,7 +424,6 @@
             else if (pendingStatus === '완료') sendUpdate('완료', textVal, '');
         }
 
-        // 💡 서버 통신 (new_linked_rows 파라미터 추가 전송)
         function sendUpdate(newStatus, actionText = "", planText = "") {
             let editPw = localStorage.getItem('dashboard_edit_pw');
             if(!editPw) return;
@@ -436,7 +437,7 @@
                 body: JSON.stringify({
                     action: "update_status", row: targetRow, status: newStatus,
                     edit_pw: editPw, action_taken: actionText, treatment_plan: planText,
-                    new_linked_rows: selectedLinkedRows // 선택한 연계 배열 전송
+                    new_linked_rows: selectedLinkedRows 
                 })
             })
             .then(res => res.json())
@@ -444,7 +445,7 @@
                 if (resData.status === "error") {
                     alert("❌ " + resData.message);
                     localStorage.removeItem('dashboard_edit_pw'); closeModal();
-                } else { closeModal(); checkPassword(true); } // 성공 시 즉시 갱신
+                } else { closeModal(); checkPassword(true); } 
             })
             .catch(err => { alert("⚠️ 통신 오류가 발생했습니다."); closeModal(); });
         }
@@ -457,7 +458,6 @@
             document.getElementById('modal-duplicate-section').style.display = 'none';
             document.getElementById('common-close-btn-wrap').style.display = 'block';
             
-            // 모든 캐시 및 임시 변수 초기화
             selectedLinkedRows = []; 
             pendingStatus = "";
             targetRow = null;
