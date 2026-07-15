@@ -11,7 +11,7 @@
         .container { max-width: 1400px; margin: 0 auto; }
         
         .header-section { text-align: center; margin-bottom: 30px; }
-        .logo-img { max-width: 150px; margin-bottom: 10px; border-radius: 8px; }
+        .logo-img { max-width: 250px; margin-bottom: 10px; border-radius: 8px; }
         h1 { color: #1a1a1a; font-size: 26px; margin: 0; font-weight: 800; }
         
         #login-screen { text-align: center; background: #ffffff; padding: 40px 20px; border-radius: 12px; border: 1px solid #eee; margin-top: 10vh; max-width: 400px; margin-left: auto; margin-right: auto; }
@@ -97,7 +97,7 @@
             <div class="header-section">
                 <!-- 로고 이미지 -->
                 <img src="logo.jpg" alt="로고" class="logo-img" onerror="console.error('로고 파일을 찾을 수 없습니다.'); this.style.display='none';">
-                <h1>실시간 아차사고 신고 현황판</h1>
+                <h1>실시간 아차사고 신고 현황</h1>
             </div>
             
             <div class="filter-section">
@@ -113,9 +113,9 @@
                 <div class="summary-box">
                     <div class="summary-title">📈 전체 누적 현황</div>
                     <div class="summary-items-wrap">
-                        <div class="summary-item">총 접수<span class="summary-num num-new" id="total-count-new">0</span></div>
-                        <div class="summary-item">총 처리중<span class="summary-num num-ing" id="total-count-ing">0</span></div>
-                        <div class="summary-item">총 완료<span class="summary-num num-done" id="total-count-done">0</span></div>
+                        <div class="summary-item">접수된 아차사고<span class="summary-num num-new" id="total-count-new">0</span></div>
+                        <div class="summary-item">처리중인 아차사고<span class="summary-num num-ing" id="total-count-ing">0</span></div>
+                        <div class="summary-item">완료된 아차사고<span class="summary-num num-done" id="total-count-done">0</span></div>
                     </div>
                 </div>
                 <div class="summary-box" id="filter-summary-box" style="display: none;">
@@ -177,7 +177,7 @@
     <div id="loading-overlay" class="modal-overlay" style="z-index: 9999;">
         <div style="background: white; padding: 30px; border-radius: 12px; text-align: center;">
             <h3>⏳ 문서 생성 중...</h3>
-            <p style="color: #666; margin-top: 10px;">데이터를 모아 구글 문서를 만들고 있습니다.<br>잠시만 기다려주세요 (약 3~5초 소요).</p>
+            <p style="color: #666; margin-top: 10px;">데이터를 모아 구글 문서를 만들고 있습니다.<br>잠시만 기다려주세요 (약 60초 이내 소요).</p>
         </div>
     </div>
 
