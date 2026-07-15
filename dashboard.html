@@ -11,7 +11,7 @@
         .container { max-width: 1400px; margin: 0 auto; }
         
         .header-section { text-align: center; margin-bottom: 30px; }
-        .logo-img { max-width: 250px; margin-bottom: 10px; border-radius: 8px; }
+        .logo-img { max-width: 150px; margin-bottom: 10px; border-radius: 8px; }
         h1 { color: #1a1a1a; font-size: 26px; margin: 0; font-weight: 800; }
         
         #login-screen { text-align: center; background: #ffffff; padding: 40px 20px; border-radius: 12px; border: 1px solid #eee; margin-top: 10vh; max-width: 400px; margin-left: auto; margin-right: auto; }
@@ -22,15 +22,20 @@
         
         .filter-section { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
         .filter-select { padding: 10px 15px; font-size: 15px; border-radius: 8px; border: 1px solid #ddd; background-color: #fff; font-family: 'Pretendard', sans-serif; cursor: pointer; outline: none; font-weight: bold; color: #333; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .active-filter-tag { display: inline-block; background: #e3f2fd; color: #1976d2; padding: 8px 16px; border-radius: 20px; font-size: 15px; font-weight: bold; margin-bottom: 20px; cursor: pointer; border: 1px solid #bbdefb; }
+        .active-filter-tag { display: inline-block; background: #e3f2fd; color: #1976d2; padding: 8px 16px; border-radius: 20px; font-size: 15px; font-weight: bold; margin-bottom: 10px; margin-right: 5px; cursor: pointer; border: 1px solid #bbdefb; transition: 0.2s; }
+        .active-filter-tag:hover { background: #bbdefb; }
         
         .summary-grid { display: grid; gap: 20px; margin-bottom: 30px; transition: 0.3s; }
         .grid-single { grid-template-columns: 1fr; } .grid-double { grid-template-columns: 1fr 1fr; } 
         .summary-box { background: #f4f6f9; padding: 20px 10px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .summary-title { text-align: center; font-size: 15px; font-weight: bold; color: #333; margin-bottom: 15px; background: #e1e4e8; padding: 5px; border-radius: 6px; width: fit-content; margin-left: auto; margin-right: auto; }
         .summary-items-wrap { display: flex; justify-content: space-around; }
-        .summary-item { text-align: center; font-size: 15px; color: #666; font-weight: 600; width: 33%; border-right: 1px solid #e1e4e8; }
+        
+        /* 💡 숫자를 클릭할 수 있도록 스타일 추가 */
+        .summary-item { text-align: center; font-size: 15px; color: #666; font-weight: 600; width: 33%; border-right: 1px solid #e1e4e8; cursor: pointer; padding: 10px; border-radius: 8px; transition: 0.2s; }
         .summary-item:last-child { border-right: none; }
+        .summary-item:hover { background: #e3f2fd; transform: scale(1.05); } /* 마우스 올렸을 때 효과 */
+        
         .summary-num { display: block; font-size: 28px; font-weight: 800; margin-top: 8px; }
         .num-new { color: #ff4b4b; } .num-ing { color: #ff9800; } .num-done { color: #4caf50; }
 
@@ -47,7 +52,6 @@
         .status-badge:hover { opacity: 0.8; transform: scale(1.05); }
         .status-접수 { background: #ff4b4b; } .status-처리중 { background: #ff9800; } .status-완료 { background: #4caf50; }
 
-        /* 💡 연계 뱃지에 클릭 기능(포인터)과 호버(크기 커짐) 효과 추가 */
         .linked-badge { background: #e3f2fd; color: #1976d2; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; margin-bottom: 10px; border: 1px solid #bbdefb; display: inline-block; cursor: pointer; transition: 0.2s; }
         .linked-badge:hover { background: #bbdefb; transform: scale(1.02); }
 
@@ -97,7 +101,7 @@
             <div class="header-section">
                 <!-- 로고 이미지 -->
                 <img src="logo.jpg" alt="로고" class="logo-img" onerror="console.error('로고 파일을 찾을 수 없습니다.'); this.style.display='none';">
-                <h1>실시간 아차사고 신고 현황</h1>
+                <h1>실시간 아차사고 신고 현황판</h1>
             </div>
             
             <div class="filter-section">
@@ -113,23 +117,25 @@
                 <div class="summary-box">
                     <div class="summary-title">📈 전체 누적 현황</div>
                     <div class="summary-items-wrap">
-                        <div class="summary-item">접수된 아차사고<span class="summary-num num-new" id="total-count-new">0</span></div>
-                        <div class="summary-item">처리중인 아차사고<span class="summary-num num-ing" id="total-count-ing">0</span></div>
-                        <div class="summary-item">완료된 아차사고<span class="summary-num num-done" id="total-count-done">0</span></div>
+                        <!-- 💡 온클릭 이벤트 추가 -->
+                        <div class="summary-item" onclick="filterByStatus('접수', 'total')" title="전체 접수 건 모아보기">접수<span class="summary-num num-new" id="total-count-new">0</span></div>
+                        <div class="summary-item" onclick="filterByStatus('처리중', 'total')" title="전체 처리중 건 모아보기">처리중<span class="summary-num num-ing" id="total-count-ing">0</span></div>
+                        <div class="summary-item" onclick="filterByStatus('완료', 'total')" title="전체 완료 건 모아보기">완료<span class="summary-num num-done" id="total-count-done">0</span></div>
                     </div>
                 </div>
                 <div class="summary-box" id="filter-summary-box" style="display: none;">
                     <div class="summary-title" id="filter-box-title">🗓️ 선택 기간 현황</div>
                     <div class="summary-items-wrap">
-                        <div class="summary-item">접수<span class="summary-num num-new" id="count-new">0</span></div>
-                        <div class="summary-item">처리중<span class="summary-num num-ing" id="count-ing">0</span></div>
-                        <div class="summary-item">완료<span class="summary-num num-done" id="count-done">0</span></div>
+                        <!-- 💡 온클릭 이벤트 추가 -->
+                        <div class="summary-item" onclick="filterByStatus('접수', 'month')" title="해당 월 접수 건 모아보기">접수<span class="summary-num num-new" id="count-new">0</span></div>
+                        <div class="summary-item" onclick="filterByStatus('처리중', 'month')" title="해당 월 처리중 건 모아보기">처리중<span class="summary-num num-ing" id="count-ing">0</span></div>
+                        <div class="summary-item" onclick="filterByStatus('완료', 'month')" title="해당 월 완료 건 모아보기">완료<span class="summary-num num-done" id="count-done">0</span></div>
                     </div>
                 </div>
             </div>
 
-            <!-- 현재 적용된 필터(장소 또는 연계그룹) 뱃지가 뜨는 곳 -->
-            <div id="active-location-filter" style="display: none; text-align: center;"></div>
+            <!-- 활성화된 모든 필터 태그들이 나타나는 공간 -->
+            <div id="active-filters-container" style="display: none; text-align: center; margin-bottom: 20px;"></div>
             
             <div id="dashboard-content"></div>
             
@@ -138,7 +144,7 @@
         </div>
     </div>
 
-    <!-- 모달창들 (상태변경, 내용확인, 로딩 등...) -->
+    <!-- 모달창들 -->
     <div id="custom-modal" class="modal-overlay">
         <div class="modal-box">
             <h3 id="modal-title">⚙️ 상태 변경</h3>
@@ -177,20 +183,21 @@
     <div id="loading-overlay" class="modal-overlay" style="z-index: 9999;">
         <div style="background: white; padding: 30px; border-radius: 12px; text-align: center;">
             <h3>⏳ 문서 생성 중...</h3>
-            <p style="color: #666; margin-top: 10px;">데이터를 모아 구글 문서를 만들고 있습니다.<br>잠시만 기다려주세요 (약 60초 이내 소요).</p>
+            <p style="color: #666; margin-top: 10px;">데이터를 모아 구글 문서를 만들고 있습니다.<br>잠시만 기다려주세요 (약 30초 소요).</p>
         </div>
     </div>
 
     <script>
-        // 🔴 웹앱 URL (배포된 최신 주소 유지)
+        // 🔴 웹앱 URL (기존 본인 URL 유지)
         const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxev7No0cR4LT2zangeNY79zQpi4OP3f-9ujmxWGSbq5VlO3vZCSaCJWjlpeufjMyKT/exec";
         
         let autoRefreshTimer = null; let targetRow = null; let pendingStatus = ""; 
         let allReportsData = []; let currentFilter = "all"; let displayLimit = 12;
         let locationFilter = null; 
-        
-        // 💡 [신규] 연계 그룹 필터용 변수 추가
         let linkedGroupFilter = null; 
+        
+        // 💡 [신규] 상태 클릭 필터용 변수
+        let statusFilter = null; 
         
         let selectedLinkedRows = []; 
 
@@ -241,10 +248,7 @@
 
         function adminLogin() {
             let editPw = prompt("보고서 출력을 위한 '관리자 비밀번호'를 입력하세요.");
-            if (editPw) {
-                localStorage.setItem('dashboard_edit_pw', editPw);
-                checkAdminUi();
-            }
+            if (editPw) { localStorage.setItem('dashboard_edit_pw', editPw); checkAdminUi(); }
         }
 
         function extractMonth(d) { let m = String(d).match(/(\d{4})[-. /년]+(\d{1,2})/); return m ? `${m[1]}년 ${m[2].padStart(2, '0')}월` : null; }
@@ -259,33 +263,36 @@
         function applyFilter() { currentFilter = document.getElementById('month-filter').value; displayLimit = 12; renderDashboard(); }
         function loadMore() { displayLimit += 12; renderDashboard(); }
         
-        // 💡 [수정] 장소 필터 클릭 시 다른 필터 해제
-        function filterByLocation(loc) { 
-            linkedGroupFilter = null; 
-            locationFilter = loc; 
-            displayLimit = 12; 
-            renderDashboard(); 
-            window.scrollTo({ top: 0, behavior: 'smooth' }); 
+        function filterByLocation(loc) { linkedGroupFilter = null; locationFilter = loc; displayLimit = 12; renderDashboard(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function filterByLinkedGroup(groupStr) { locationFilter = null; linkedGroupFilter = groupStr; displayLimit = 12; renderDashboard(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        
+        // 💡 [신규] 상태 현황 클릭 시 필터 적용 함수
+        function filterByStatus(status, scope) {
+            // 전체 현황 박스를 클릭했다면, 월별 필터와 기타 필터를 리셋
+            if (scope === 'total') {
+                document.getElementById('month-filter').value = "all";
+                currentFilter = "all";
+                locationFilter = null;
+                linkedGroupFilter = null;
+            }
+            statusFilter = status;
+            displayLimit = 12;
+            renderDashboard();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 💡 [신규] 연계 그룹 필터 클릭 시 동작
-        function filterByLinkedGroup(groupStr) { 
-            locationFilter = null; 
-            linkedGroupFilter = groupStr; 
-            displayLimit = 12; 
-            renderDashboard(); 
-            window.scrollTo({ top: 0, behavior: 'smooth' }); 
-        }
-
-        // 💡 [수정] 모든 활성 필터(장소, 그룹)를 끄는 공통 함수
-        function clearActiveFilters() { 
-            locationFilter = null; 
-            linkedGroupFilter = null; 
-            renderDashboard(); 
+        // 특정 필터 태그만 끄는 함수
+        function clearFilter(type) {
+            if (type === 'location') locationFilter = null;
+            if (type === 'group') linkedGroupFilter = null;
+            if (type === 'status') statusFilter = null;
+            renderDashboard();
         }
 
         function renderDashboard() {
             const contentDiv = document.getElementById('dashboard-content');
+            
+            // 1. 전체 누적 카운트 계산
             let totalNew = 0, totalIng = 0, totalDone = 0;
             allReportsData.forEach(i => {
                 let s = i.status || "접수";
@@ -293,39 +300,51 @@
             });
             document.getElementById('total-count-new').innerText = totalNew; document.getElementById('total-count-ing').innerText = totalIng; document.getElementById('total-count-done').innerText = totalDone;
 
-            // 월별 필터링
-            let filtered = currentFilter === "all" ? allReportsData : allReportsData.filter(i => extractMonth(i.date) === currentFilter);
+            // 2. 월별 기본 필터링 데이터 구성 (집계용 데이터)
+            let baseFiltered = currentFilter === "all" ? allReportsData : allReportsData.filter(i => extractMonth(i.date) === currentFilter);
             
-            // 💡 [수정] 장소 필터링 또는 연계 그룹 필터링 적용
-            if (locationFilter) {
-                filtered = filtered.filter(i => i.location === locationFilter);
-            } else if (linkedGroupFilter) {
-                filtered = filtered.filter(i => String(i.linked_group) === String(linkedGroupFilter));
-            }
+            // 3. 장소 또는 연계 그룹 필터 적용
+            if (locationFilter) baseFiltered = baseFiltered.filter(i => i.location === locationFilter);
+            else if (linkedGroupFilter) baseFiltered = baseFiltered.filter(i => String(i.linked_group) === String(linkedGroupFilter));
 
-            document.getElementById('filter-summary-box').style.display = currentFilter === "all" ? 'none' : 'block';
-            document.getElementById('main-summary-grid').className = currentFilter === "all" ? 'summary-grid grid-single' : 'summary-grid grid-double';
-            if(currentFilter !== "all") document.getElementById('filter-box-title').innerText = `🗓️ ${currentFilter} 현황`;
-            
+            // 4. 선택 기간 현황 카운트 계산 (상태 필터링 이전의 개수로 보여줘야 박스 숫자가 유지됨)
             let cNew = 0, cIng = 0, cDone = 0;
-            filtered.forEach(i => {
+            baseFiltered.forEach(i => {
                 let s = i.status || "접수";
                 if (s.includes("완료")) cDone++; else if (s.includes("처리중")) cIng++; else cNew++;
             });
             document.getElementById('count-new').innerText = cNew; document.getElementById('count-ing').innerText = cIng; document.getElementById('count-done').innerText = cDone;
             
-            // 💡 [수정] 활성화된 필터 뱃지(태그) 화면 상단에 표시
-            let activeFilterHtml = "";
-            if (locationFilter) {
-                activeFilterHtml = `<span class="active-filter-tag" onclick="clearActiveFilters()" title="클릭 시 해제">📍 [${locationFilter}] 동일 장소 모아보기 ✖️</span>`;
-            } else if (linkedGroupFilter) {
-                let groupNumbers = String(linkedGroupFilter).split(',').map(n => parseInt(n) - 1).join(', #');
-                activeFilterHtml = `<span class="active-filter-tag" onclick="clearActiveFilters()" title="클릭 시 해제">🔗 통합 처리 건 (#${groupNumbers} 번) 모아보기 ✖️</span>`;
-            }
-            document.getElementById('active-location-filter').innerHTML = activeFilterHtml;
-            document.getElementById('active-location-filter').style.display = activeFilterHtml ? 'block' : 'none';
+            document.getElementById('filter-summary-box').style.display = currentFilter === "all" ? 'none' : 'block';
+            document.getElementById('main-summary-grid').className = currentFilter === "all" ? 'summary-grid grid-single' : 'summary-grid grid-double';
+            if(currentFilter !== "all") document.getElementById('filter-box-title').innerText = `🗓️ ${currentFilter} 현황`;
 
-            contentDiv.innerHTML = filtered.length === 0 ? '<div class="empty-msg">데이터가 없습니다.</div>' : filtered.slice(0, displayLimit).map(i => {
+            // 5. 상태 필터 적용 (최종 화면에 보일 데이터)
+            let finalDisplayData = baseFiltered;
+            if (statusFilter) {
+                finalDisplayData = finalDisplayData.filter(i => {
+                    let s = i.status || "접수";
+                    if (statusFilter === "완료") return s.includes("완료");
+                    if (statusFilter === "처리중") return s.includes("처리중");
+                    return !s.includes("완료") && !s.includes("처리중"); // 접수
+                });
+            }
+
+            // 6. 켜져 있는 필터들을 모아서 화면 태그로 렌더링
+            let activeTags = [];
+            if (locationFilter) activeTags.push(`<span class="active-filter-tag" onclick="clearFilter('location')" title="클릭 시 해제">📍 [${locationFilter}] 모아보기 ✖️</span>`);
+            if (linkedGroupFilter) {
+                let groupNumbers = String(linkedGroupFilter).split(',').map(n => parseInt(n) - 1).join(', #');
+                activeTags.push(`<span class="active-filter-tag" onclick="clearFilter('group')" title="클릭 시 해제">🔗 통합 처리 건 (#${groupNumbers} 번) 모아보기 ✖️</span>`);
+            }
+            if (statusFilter) activeTags.push(`<span class="active-filter-tag" onclick="clearFilter('status')" title="클릭 시 해제">📌 [${statusFilter}] 상태 모아보기 ✖️</span>`);
+            
+            const tagsContainer = document.getElementById('active-filters-container');
+            tagsContainer.innerHTML = activeTags.join(' ');
+            tagsContainer.style.display = activeTags.length > 0 ? 'block' : 'none';
+
+            // 7. 카드 렌더링
+            contentDiv.innerHTML = finalDisplayData.length === 0 ? '<div class="empty-msg">데이터가 없습니다.</div>' : finalDisplayData.slice(0, displayLimit).map(i => {
                 let status = i.status || "접수", b = status.includes("완료") ? "status-완료" : (status.includes("처리중") ? "status-처리중" : "status-접수");
                 let action = '';
                 if (status.includes("완료") && i.action_taken) action = `<div class="action-result"><strong>✅ 조치 내역:</strong><br>${i.action_taken}</div>`;
@@ -333,7 +352,6 @@
                 else if (status.includes("처리중")) action = `<div class="plan-result"><strong>🚧 처리 계획:</strong><br>입력된 계획이 없습니다.</div>`;
                 else action = `<div class="wait-result"><strong>⏳ 조치 대기 중</strong><br>담당자가 내용을 확인하고 있습니다.</div>`;
                 
-                // 💡 [수정] 연계 뱃지에 클릭 기능(onclick) 연결
                 let linkBadgeHtml = '';
                 if (i.linked_group) {
                     let others = String(i.linked_group).split(',').map(n => parseInt(n) - 1).filter(n => n !== (i.row - 1));
@@ -351,8 +369,8 @@
                 </div>`;
             }).join('');
             
-            document.getElementById('btn-load-more').style.display = filtered.length > displayLimit ? 'block' : 'none';
-            if(filtered.length > displayLimit) document.getElementById('btn-load-more').innerText = `➕ 더보기 (${displayLimit} / ${filtered.length})`;
+            document.getElementById('btn-load-more').style.display = finalDisplayData.length > displayLimit ? 'block' : 'none';
+            if(finalDisplayData.length > displayLimit) document.getElementById('btn-load-more').innerText = `➕ 더보기 (${displayLimit} / ${finalDisplayData.length})`;
         }
 
         function generateReport() {
