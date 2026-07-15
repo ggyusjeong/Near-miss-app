@@ -317,6 +317,9 @@
             const targetMonth = document.getElementById('month-filter').value;
             document.getElementById('loading-overlay').style.display = 'flex';
 
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 60000);
+
             fetch(WEBAPP_URL, {
                 method: 'POST',
                 body: JSON.stringify({ action: "generate_report", edit_pw: editPw, target_month: targetMonth })
