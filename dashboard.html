@@ -306,42 +306,50 @@
             if(filtered.length > displayLimit) document.getElementById('btn-load-more').innerText = `➕ 더보기 (${displayLimit} / ${filtered.length})`;
         }
 
-        function generateReport() {
-            let editPw = localStorage.getItem('dashboard_edit_pw');
-            if (!editPw) {
-                alert("관리자 권한이 필요합니다.");
+function generateReport() {
+    let editPw = localStorage.getItem('dashboard_edit_pw');
+    if (!editPw) {
+        alert("관리자 권한이 필요합니다.");
+        checkAdminUi();
+        return;
+    }
+
+    const targetMonth = document.getElementById('month-filter').value;
+    document.getElementById('loading-overlay').style.display = 'flex';
+
+    // 💡 fetch에 타임아웃 설정을 추가하고 대기 시간을 늘립니다.
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 30초까지 기다림
+
+    fetch(WEBAPP_URL, {
+        method: 'POST',
+        signal: controller.signal, // 타임아웃 적용
+        body: JSON.stringify({ action: "generate_report", edit_pw: editPw, target_month: targetMonth })
+    })
+    .then(res => {
+        clearTimeout(timeoutId);
+        return res.json();
+    })
+    .then(resData => {
+        document.getElementById('loading-overlay').style.display = 'none';
+        if (resData.status === "error") {
+            alert("❌ 에러 발생: " + resData.message);
+            if (resData.message.includes("권한")) {
+                localStorage.removeItem('dashboard_edit_pw');
                 checkAdminUi();
-                return;
             }
-
-            const targetMonth = document.getElementById('month-filter').value;
-            document.getElementById('loading-overlay').style.display = 'flex';
-
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 60000);
-
-            fetch(WEBAPP_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: "generate_report", edit_pw: editPw, target_month: targetMonth })
-            })
-            .then(res => res.json())
-            .then(resData => {
-                document.getElementById('loading-overlay').style.display = 'none';
-                if (resData.status === "error") {
-                    alert("❌ " + resData.message);
-                    localStorage.removeItem('dashboard_edit_pw');
-                    checkAdminUi();
-                } else {
-                    alert("✅ 보고서가 구글 드라이브에 성공적으로 생성되었습니다!\n확인을 누르면 문서가 열립니다.");
-                    window.open(resData.url, '_blank');
-                }
-            })
-            .catch(err => { 
-                document.getElementById('loading-overlay').style.display = 'none';
-                alert("⚠️ 통신 오류가 발생했습니다."); 
-            });
+        } else {
+            alert("✅ 보고서가 성공적으로 생성되었습니다!");
+            window.open(resData.url, '_blank');
         }
-
+    })
+    .catch(err => { 
+        document.getElementById('loading-overlay').style.display = 'none';
+        // 에러 상세 내용 확인
+        console.error(err);
+        alert("⚠️ 통신 오류가 발생했습니다. 구글 서버 상태가 불안정하거나 문서 생성 권한 문제일 수 있습니다."); 
+    });
+}
         function showContentModal(r) { const i = allReportsData.find(x => x.row === r); document.getElementById('full-description-text').innerText = i.description; document.getElementById('content-read-modal').style.display = 'flex'; }
         function closeContentModal() { document.getElementById('content-read-modal').style.display = 'none'; }
         
