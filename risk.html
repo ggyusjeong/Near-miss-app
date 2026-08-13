@@ -119,15 +119,17 @@
         
         let editPw = localStorage.getItem('dashboard_edit_pw');
 
-        // 💡 [수정] 페이지 로드 시 실행될 통합 로직
+       // 💡 [수정] 페이지 로드 시 실행될 통합 로직
         document.addEventListener("DOMContentLoaded", function() {
             loadRiskData(); // 기존 데이터 불러오기
             
-            // 대시보드에서 URL을 통해 전달받은 데이터가 있는지 확인합니다.
+            // 대시보드에서 URL을 통해 전달받은 데이터가 있는지 확인
             const urlParams = new URLSearchParams(window.location.search);
             const preZone = urlParams.get('zone');
             const preFactor = urlParams.get('factor');
-
+            const prePlan = urlParams.get('plan');         // 💡 추가됨: 조치 내역
+            const preDeadline = urlParams.get('deadline'); // 💡 추가됨: 조치 기한
+            
             // 이관된 데이터가 존재한다면 폼을 자동으로 띄우고 채워줍니다.
             if (preZone || preFactor) {
                 setTimeout(() => {
@@ -136,18 +138,20 @@
                         if(editPw) localStorage.setItem('dashboard_edit_pw', editPw);
                         else return;
                     }
-                    // 모달 창 열기
+                    
                     document.getElementById('add-modal').style.display = 'flex';
                     
-                    // 폼(Form)에 데이터 자동 입력
+                    // 💡 전달받은 데이터를 폼에 자동 입력
                     if(preZone) document.getElementById('m-zone').value = preZone;
                     if(preFactor) document.getElementById('m-factor').value = preFactor;
+                    if(prePlan) document.getElementById('m-plan').value = prePlan;         // 추가됨
+                    if(preDeadline) document.getElementById('m-deadline').value = preDeadline; // 추가됨
                     
                     calcRisk(); // 위험도 자동 계산기 작동
                     
-                    // 새로고침 시 모달창이 또 뜨는 것을 방지하기 위해 주소창 뒤의 데이터를 깔끔하게 지웁니다.
+                    // 주소창 지우기 (새로고침 시 중복 팝업 방지)
                     window.history.replaceState({}, document.title, window.location.pathname);
-                }, 600); // 화면이 뜬 후 0.6초 뒤에 부드럽게 모달을 띄움
+                }, 600); 
             }
         });
 
