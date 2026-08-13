@@ -424,7 +424,7 @@
             currentContentRow = null;
         }
 
-// 💡 [수정] 위험성평가 페이지로 데이터를 들고 넘어가는 함수 (과거 날짜 적용)
+// 💡 [초강력 수정 버전] 날짜 형식을 완벽하게 보정하여 과거 완료일 전달
         function sendToRiskAssessment() {
             const item = allReportsData.find(x => x.row === currentContentRow);
             if(item) {
@@ -435,16 +435,21 @@
                         url += `&plan=${encodeURIComponent(item.action_taken)}`;
                     }
                     
-                    // 💡 [수정] 과거에 실제 조치 완료된 날짜가 있다면 그 날짜를 우선 적용!
                     let finalDateStr = "";
                     
-                    if (item.completed_date && item.completed_date.length >= 10) {
-                        // 엑셀에 기록된 "YYYY-MM-DD HH:mm:ss" 에서 날짜(앞 10자리)만 딱 잘라옵니다.
-                        finalDateStr = item.completed_date.substring(0, 10);
-                        // 엑셀 서식에 따라 . 이 섞여있을 수 있으므로 - 로 통일 보정
-                        finalDateStr = finalDateStr.replace(/\./g, '-').replace(/ /g, '');
-                    } else {
-                        // 혹시라도 완료 날짜 기록이 없는 옛날 데이터라면 오늘 날짜를 임시로 씁니다.
+                    // 💡 정규식(Regex)을 이용해 텍스트에서 연, 월, 일을 안전하게 추출합니다.
+                    if (item.completed_date) {
+                        let match = String(item.completed_date).match(/(\d{4})[^\d]+(\d{1,2})[^\d]+(\d{1,2})/);
+                        if (match) {
+                            let yyyy = match[1];
+                            let mm = String(match[2]).padStart(2, '0'); // 무조건 두 자리로 변조 (예: 8 -> 08)
+                            let dd = String(match[3]).padStart(2, '0'); // 무조건 두 자리로 변조 (예: 5관 -> 05)
+                            finalDateStr = `${yyyy}-${mm}-${dd}`;
+                        }
+                    }
+                    
+                    // 추출 실패 시 오늘 날짜로 안전하게 폴백
+                    if (!finalDateStr) {
                         const today = new Date();
                         const yyyy = today.getFullYear();
                         const mm = String(today.getMonth() + 1).padStart(2, '0');
