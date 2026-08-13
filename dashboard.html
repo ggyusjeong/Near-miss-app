@@ -424,12 +424,27 @@
             currentContentRow = null;
         }
 
-        // 💡 [신규] 위험성평가 페이지로 데이터를 들고 넘어가는 함수
+        // 💡 [수정] 위험성평가 페이지로 데이터를 들고 넘어가는 함수
         function sendToRiskAssessment() {
             const item = allReportsData.find(x => x.row === currentContentRow);
             if(item) {
-                // 장소와 신고내용을 암호화하여 risk.html URL 뒤에 붙여서 새 창으로 엽니다.
-                const url = `risk.html?zone=${encodeURIComponent(item.location)}&factor=${encodeURIComponent(item.description)}`;
+                // 기본 데이터 (장소, 위험요인) 셋팅
+                let url = `risk.html?zone=${encodeURIComponent(item.location)}&factor=${encodeURIComponent(item.description)}`;
+                
+                // 💡 [추가] 만약 이미 조치 '완료'된 건이라면?
+                if (item.status && item.status.includes("완료")) {
+                    // 1. 대시보드의 '조치 내역'을 위험성평가의 '개선 대책'으로 전달
+                    if (item.action_taken) {
+                        url += `&plan=${encodeURIComponent(item.action_taken)}`;
+                    }
+                    // 2. 이관하는 시점(오늘 날짜)을 '조치 기한'으로 자동 셋팅 (YYYY-MM-DD 포맷)
+                    const today = new Date();
+                    const yyyy = today.getFullYear();
+                    const mm = String(today.getMonth() + 1).padStart(2, '0');
+                    const dd = String(today.getDate()).padStart(2, '0');
+                    url += `&deadline=${yyyy}-${mm}-${dd}`;
+                }
+                
                 window.open(url, '_blank');
             }
         }
