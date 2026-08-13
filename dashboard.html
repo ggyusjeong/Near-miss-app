@@ -409,8 +409,30 @@
             });
         }
 
-        function showContentModal(r) { const i = allReportsData.find(x => x.row === r); document.getElementById('full-description-text').innerText = i.description; document.getElementById('content-read-modal').style.display = 'flex'; }
-        function closeContentModal() { document.getElementById('content-read-modal').style.display = 'none'; }
+        // 💡 [신규] 현재 열려있는 상세 카드의 행(Row) 번호를 기억할 변수
+        let currentContentRow = null; 
+
+        function showContentModal(r) { 
+            currentContentRow = r; 
+            const i = allReportsData.find(x => x.row === r); 
+            document.getElementById('full-description-text').innerText = i.description; 
+            document.getElementById('content-read-modal').style.display = 'flex'; 
+        }
+        
+        function closeContentModal() { 
+            document.getElementById('content-read-modal').style.display = 'none'; 
+            currentContentRow = null;
+        }
+
+        // 💡 [신규] 위험성평가 페이지로 데이터를 들고 넘어가는 함수
+        function sendToRiskAssessment() {
+            const item = allReportsData.find(x => x.row === currentContentRow);
+            if(item) {
+                // 장소와 신고내용을 암호화하여 risk.html URL 뒤에 붙여서 새 창으로 엽니다.
+                const url = `risk.html?zone=${encodeURIComponent(item.location)}&factor=${encodeURIComponent(item.description)}`;
+                window.open(url, '_blank');
+            }
+        }
         
         function openModal(r) { 
             targetRow = r; pendingStatus = ""; selectedLinkedRows = []; document.getElementById('modal-textarea').value = ""; 
