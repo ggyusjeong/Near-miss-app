@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>위험성평가 관리 체계</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📋</text></svg>">
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        body { font-family: 'Pretendard', sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
+        h1 { color: #1a1a1a; font-size: 24px; margin: 0; font-weight: 800; }
+        .btn-primary { background: #333; color: white; padding: 12px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-primary:hover { background: #1a1a1a; transform: translateY(-2px); }
+        
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        .risk-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e1e4e8; }
+        
+        .card-header { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; }
+        .zone-title { font-weight: 800; font-size: 18px; color: #1976d2; }
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .status-조치전 { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; cursor: pointer;}
+        .status-완료 { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+        
+        .data-row { margin-bottom: 10px; font-size: 14px; }
+        .label { color: #666; font-weight: 600; display: inline-block; width: 90px; }
+        .value { color: #333; }
+        
+        .risk-score { font-size: 24px; font-weight: 900; text-align: center; padding: 15px; margin: 15px 0; border-radius: 8px; }
+        .score-low { background: #e8f5e9; color: #2e7d32; } /* 1~2점 */
+        .score-mid { background: #fff3e0; color: #ef6c00; } /* 3~4점 */
+        .score-high { background: #ffebee; color: #c62828; } /* 6~9점 */
+
+        /* Modal Styles */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(3px); }
+        .modal-box { background: white; padding: 30px; border-radius: 16px; width: 400px; max-width: 90%; max-height: 90vh; overflow-y: auto; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px; color: #333; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; font-size: 14px; box-sizing: border-box; }
+        .score-calc-box { background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 15px; border: 1px solid #e9ecef; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 상시 위험성평가 관리</h1>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-primary" style="background: #fff; color: #333; border: 1px solid #ddd;" onclick="location.href='dashboard.html'">⬅️ 대시보드 복귀</button>
+                <button class="btn-primary" onclick="openModal()">+ 신규 위험요인 등록</button>
+            </div>
+        </div>
+
+        <div class="grid-container" id="risk-content">
+            <!-- Data will be loaded here -->
+            <p style="text-align: center; width: 100%; color: #666; margin-top: 50px;">데이터를 불러오는 중입니다...</p>
+        </div>
+    </div>
+
+    <!-- 신규 등록 모달 -->
+    <div class="modal-overlay" id="add-modal">
+        <div class="modal-box">
+            <h2 style="margin-top: 0;">새 위험요인 등록</h2>
+            <div class="form-group">
+                <label>구역 / 작업명</label>
+                <input type="text" id="m-zone" placeholder="예: 2층 A/V실, 야외 보육실, 무대장비 점검">
+            </div>
+            <div class="form-group">
+                <label>위험 요인 (아차사고 요인)</label>
+                <textarea id="m-factor" rows="2" placeholder="어떤 위험이 존재하나요?"></textarea>
+            </div>
+            <div class="form-group">
+                <label>현재 안전조치 상태</label>
+                <input type="text" id="m-current" placeholder="예: 구두 경고 중, 조치 없음 등">
+            </div>
+            
+            <div style="display: flex; gap: 10px;">
+                <div class="form-group" style="flex: 1;">
+                    <label>발생 빈도 (1~3)</label>
+                    <select id="m-freq" onchange="calcRisk()">
+                        <option value="1">1 (연 1회 이하)</option>
+                        <option value="2">2 (월 1회 수준)</option>
+                        <option value="3" selected>3 (주 1회 이상/수시)</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>피해 강도 (1~3)</label>
+                    <select id="m-sev" onchange="calcRisk()">
+                        <option value="1">1 (경미한 부상)</option>
+                        <option value="2" selected>2 (휴업 요하는 부상)</option>
+                        <option value="3">3 (사망 및 중대재해)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="score-calc-box">
+                <div style="font-size: 13px; color: #666;">산출된 위험도 (빈도 × 강도)</div>
+                <div id="m-result" style="font-size: 24px; font-weight: 900; color: #c62828;">6점 (높음)</div>
+            </div>
+
+            <div class="form-group">
+                <label>개선 대책</label>
+                <textarea id="m-plan" rows="2" placeholder="어떻게 물리적/관리적으로 개선할 계획인가요?"></textarea>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <div class="form-group" style="flex: 1;"><label>담당자</label><input type="text" id="m-manager" placeholder="부서/이름"></div>
+                <div class="form-group" style="flex: 1;"><label>조치기한</label><input type="date" id="m-deadline"></div>
+            </div>
+
+            <button class="btn-primary" style="width: 100%; margin-bottom: 10px;" onclick="submitRisk()">저장하기</button>
+            <button class="btn-primary" style="width: 100%; background: #fff; color: #888; border: 1px solid #ddd;" onclick="closeModal()">취소</button>
+        </div>
+    </div>
+
+    <script>
+        // 🔴 반드시 본인의 앱스 스크립트 웹앱 URL로 교체하세요!
+        const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxev7No0cR4LT2zangeNY79zQpi4OP3f-9ujmxWGSbq5VlO3vZCSaCJWjlpeufjMyKT/exec";
+        
+        let editPw = localStorage.getItem('dashboard_edit_pw');
+
+        document.addEventListener("DOMContentLoaded", loadRiskData);
+
+        function loadRiskData() {
+            let pw = localStorage.getItem('dashboard_pw');
+            if(!pw) { alert("대시보드 로그인이 필요합니다."); location.href = "dashboard.html"; return; }
+
+            fetch(WEBAPP_URL + "?pw=" + pw + "&type=risk")
+            .then(r => r.json())
+            .then(data => {
+                const container = document.getElementById('risk-content');
+                if(data.length === 0 || data.error) {
+                    container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 50px; background: white; border-radius: 12px;">등록된 위험성평가 데이터가 없습니다.</div>`;
+                    return;
+                }
+                
+                container.innerHTML = data.reverse().map(i => {
+                    let s = parseInt(i.risk_level);
+                    let scoreClass = s <= 2 ? "score-low" : (s <= 4 ? "score-mid" : "score-high");
+                    let scoreText = s <= 2 ? "낮음 (수용 가능)" : (s <= 4 ? "보통 (개선 필요)" : "높음 (즉각 조치)");
+                    let statusBtn = i.status === "조치전" ? `<span class="status-badge status-조치전" onclick="completeRisk(${i.row})">🚧 조치전 (클릭하여 완료)</span>` : `<span class="status-badge status-완료">✅ 조치완료</span>`;
+
+                    return `
+                    <div class="risk-card">
+                        <div class="card-header">
+                            <span class="zone-title">📍 ${i.zone}</span>
+                            ${statusBtn}
+                        </div>
+                        <div class="data-row"><span class="label">위험 요인</span><span class="value"><strong>${i.factor}</strong></span></div>
+                        <div class="data-row"><span class="label">현재 조치</span><span class="value">${i.current_action}</span></div>
+                        
+                        <div class="risk-score ${scoreClass}">위험도: ${s}점<br><span style="font-size:14px; font-weight:normal;">${scoreText}</span></div>
+                        
+                        <div class="data-row"><span class="label">개선 대책</span><span class="value" style="color:#1976d2; font-weight:bold;">${i.plan}</span></div>
+                        <div style="display:flex; justify-content: space-between; border-top: 1px dashed #ddd; padding-top: 10px; margin-top: 10px;">
+                            <div class="data-row" style="margin:0;"><span class="label" style="width:auto; margin-right:5px;">담당:</span><span class="value">${i.manager}</span></div>
+                            <div class="data-row" style="margin:0;"><span class="label" style="width:auto; margin-right:5px;">기한:</span><span class="value">${i.deadline}</span></div>
+                        </div>
+                    </div>`;
+                }).join('');
+            }).catch(e => {
+                document.getElementById('risk-content').innerHTML = "데이터 로딩 중 오류가 발생했습니다.";
+            });
+        }
+
+        function calcRisk() {
+            let f = parseInt(document.getElementById('m-freq').value);
+            let s = parseInt(document.getElementById('m-sev').value);
+            let total = f * s;
+            let resultEl = document.getElementById('m-result');
+            resultEl.innerText = `${total}점 ` + (total <= 2 ? "(낮음)" : (total <= 4 ? "(보통)" : "(높음)"));
+            resultEl.style.color = total <= 2 ? "#2e7d32" : (total <= 4 ? "#ef6c00" : "#c62828");
+        }
+
+        function openModal() {
+            if(!editPw) {
+                editPw = prompt("관리자 비밀번호를 입력하세요.");
+                if(editPw) localStorage.setItem('dashboard_edit_pw', editPw);
+                else return;
+            }
+            document.getElementById('add-modal').style.display = 'flex';
+            calcRisk();
+        }
+        function closeModal() { document.getElementById('add-modal').style.display = 'none'; }
+
+        function submitRisk() {
+            let payload = {
+                action: "add_risk", edit_pw: editPw,
+                zone: document.getElementById('m-zone').value, factor: document.getElementById('m-factor').value,
+                current_action: document.getElementById('m-current').value, freq: document.getElementById('m-freq').value,
+                severity: document.getElementById('m-sev').value, plan: document.getElementById('m-plan').value,
+                manager: document.getElementById('m-manager').value, deadline: document.getElementById('m-deadline').value
+            };
+            if(!payload.zone || !payload.factor) { alert("구역과 위험요인은 필수 입력입니다."); return; }
+
+            document.querySelector('#add-modal h2').innerText = "저장 중...⏳";
+            fetch(WEBAPP_URL, { method: 'POST', body: JSON.stringify(payload) })
+            .then(r => r.json()).then(res => {
+                if(res.status === "error") { alert("권한이 없거나 오류가 발생했습니다."); localStorage.removeItem('dashboard_edit_pw'); editPw = null; }
+                else { alert("등록되었습니다."); location.reload(); }
+            });
+        }
+
+        function completeRisk(rowNum) {
+            if(!editPw) {
+                editPw = prompt("상태를 변경하기 위한 관리자 비밀번호를 입력하세요.");
+                if(editPw) localStorage.setItem('dashboard_edit_pw', editPw); else return;
+            }
+            if(!confirm("해당 위험요소의 개선조치를 완료 처리하시겠습니까?")) return;
+            
+            fetch(WEBAPP_URL, { method: 'POST', body: JSON.stringify({ action: "update_risk_status", row: rowNum, status: "완료", edit_pw: editPw }) })
+            .then(r => r.json()).then(res => {
+                if(res.status === "success") { alert("완료 처리되었습니다."); loadRiskData(); }
+                else alert("오류가 발생했습니다.");
+            });
+        }
+    </script>
+</body>
+</html>
